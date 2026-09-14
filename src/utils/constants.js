@@ -66,3 +66,19 @@ export const MEETING_PLATFORMS = [
   { value: 'anydesk', label: 'AnyDesk', icon: '🖥️' },
   { value: 'teamviewer', label: 'TeamViewer', icon: '🖥️' },
 ];
+// ─── ITEM CONFIG ────────────────────────────────
+export const ITEM_STATUS_OPTIONS = [
+  { value: 'pending', label: '⏳ Pending' },
+  { value: 'in-progress', label: '🟡 In Progress' },
+  { value: 'for-review', label: '👀 For Review' },
+  { value: 'completed', label: '✅ Completed' },
+  { value: 'on-hold', label: '⏸️ On Hold' },
+  { value: 'cancelled', label: '❌ Cancelled' },
+];
+
+export const ITEM_PRIORITY_OPTIONS = [
+  { value: 'critical', label: '🚨 Critical' },
+  { value: 'high', label: '🔴 High' },
+  { value: 'medium', label: '🟡 Medium' },
+  { value: 'low', label: '🟢 Low' },
+];

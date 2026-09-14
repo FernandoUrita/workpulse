@@ -153,3 +153,43 @@ export function generateMomFromTemplate(meeting, template) {
     .replace(/{attendees}/g, attendeesList)
     .replace(/{agenda}/g, agendaList);
 }
+// ─── ITEM HELPERS ───────────────────────────────
+export function getCheckinStatus(nextCheck) {
+  if (!nextCheck) return null;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const next = new Date(nextCheck + 'T00:00:00');
+  const diffDays = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) {
+    return { status: 'due', label: `Check-in overdue by ${Math.abs(diffDays)}d` };
+  } else if (diffDays === 0) {
+    return { status: 'due', label: 'Check-in due today' };
+  } else if (diffDays <= 2) {
+    return { status: 'soon', label: `Check-in in ${diffDays}d` };
+  } else {
+    return { status: 'ok', label: `Next: ${formatDate(nextCheck)}` };
+  }
+}
+
+export function getTargetDateStatus(targetDate, itemStatus) {
+  if (!targetDate) return null;
+  if (itemStatus === 'completed' || itemStatus === 'cancelled') {
+    return { color: 'inherit', note: '' };
+  }
+
+  const target = new Date(targetDate + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) {
+    return { color: 'var(--danger)', note: ` (${Math.abs(diffDays)}d overdue)` };
+  } else if (diffDays === 0) {
+    return { color: 'var(--warning)', note: ' (today)' };
+  } else if (diffDays <= 3) {
+    return { color: 'var(--warning)', note: ` (${diffDays}d left)` };
+  }
+  return { color: 'inherit', note: '' };
+}
