@@ -371,7 +371,6 @@
   padding: 20px;
 }
 
-cat >> src/styles/layout.css << 'EOF'
 
 /* ─── AUTH OVERLAY ────────────────────────────── */
 .auth-overlay {
