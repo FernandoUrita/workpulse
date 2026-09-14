@@ -102,3 +102,54 @@ export function getTaskStats(tasks) {
   
   return { total, completed, pending, overdue, percent };
 }
+
+// ─── MEETING HELPERS ────────────────────────────
+export function isMeetingPast(meeting) {
+  if (!meeting.date) return false;
+  const meetingDate = new Date(`${meeting.date}T${meeting.time || '00:00'}`);
+  return meetingDate < new Date();
+}
+
+export function generateMomFromTemplate(meeting, template) {
+  const platformLabels = {
+    zoom: 'Zoom',
+    teams: 'Microsoft Teams',
+    gmeet: 'Google Meet',
+    viber: 'Viber Call',
+    anydesk: 'AnyDesk',
+    teamviewer: 'TeamViewer',
+    onsite: 'On-site',
+  };
+
+  const attendeesList = meeting.attendees?.length > 0
+    ? meeting.attendees.map(a => `• ${a}`).join('\n')
+    : 'No attendees listed';
+
+  const agendaList = meeting.agenda?.length > 0
+    ? meeting.agenda.map((a, i) => `${i + 1}. ${a}`).join('\n')
+    : 'No agenda items';
+
+  const typeLabel = meeting.type === 'remote' ? '💻 Remote' : '🏢 Physical';
+  const platformLabel = meeting.platform 
+    ? (platformLabels[meeting.platform] || meeting.platform) 
+    : 'N/A';
+
+  let credsString = 'N/A';
+  if (meeting.anydeskId) {
+    credsString = `AnyDesk ID: ${meeting.anydeskId}${meeting.anydeskPassword ? ' | Password: ' + meeting.anydeskPassword : ''}`;
+  } else if (meeting.teamviewerId) {
+    credsString = `TeamViewer ID: ${meeting.teamviewerId}${meeting.teamviewerPassword ? ' | Password: ' + meeting.teamviewerPassword : ''}`;
+  }
+
+  return template
+    .replace(/{title}/g, meeting.title || 'N/A')
+    .replace(/{date}/g, meeting.date || 'N/A')
+    .replace(/{time}/g, meeting.time || 'N/A')
+    .replace(/{type}/g, typeLabel)
+    .replace(/{platform}/g, platformLabel)
+    .replace(/{location}/g, meeting.location || 'N/A')
+    .replace(/{link}/g, meeting.link || 'N/A')
+    .replace(/{credentials}/g, credsString)
+    .replace(/{attendees}/g, attendeesList)
+    .replace(/{agenda}/g, agendaList);
+}

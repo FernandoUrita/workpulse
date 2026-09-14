@@ -56,3 +56,13 @@ export const PLATFORM_ICONS = {
   teamviewer: '🖥️',
   onsite: '🏢',
 };
+
+// ─── MEETING PLATFORMS ──────────────────────────
+export const MEETING_PLATFORMS = [
+  { value: 'zoom', label: 'Zoom', icon: '💻' },
+  { value: 'teams', label: 'Microsoft Teams', icon: '💼' },
+  { value: 'gmeet', label: 'Google Meet', icon: '📹' },
+  { value: 'viber', label: 'Viber Call', icon: '📱' },
+  { value: 'anydesk', label: 'AnyDesk', icon: '🖥️' },
+  { value: 'teamviewer', label: 'TeamViewer', icon: '🖥️' },
+];
