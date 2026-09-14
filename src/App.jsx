@@ -7,7 +7,7 @@ import DashboardPage from './features/dashboard/DashboardPage.jsx';
 import TasksPage from './features/tasks/TasksPage.jsx';
 import MeetingsPage from './features/meetings/MeetingsPage.jsx';
 import ItemsPage from './features/items/ItemsPage.jsx';
-import MomPage from './features/mom/MomPage.jsx';
+import MomTemplatesPage from './features/mom/MomTemplatesPage.jsx';
 import SettingsPage from './features/settings/SettingsPage.jsx';
 
 function ProtectedRoute({ children }) {
@@ -91,7 +91,7 @@ export default function App() {
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/meetings" element={<MeetingsPage />} />
         <Route path="/items" element={<ItemsPage />} />
-        <Route path="/mom" element={<MomPage />} />
+        <Route path="/mom" element={<MomTemplatesPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
