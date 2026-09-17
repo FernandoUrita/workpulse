@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+/* ─── Map existing CSS variables to Tailwind theme ─── */
+@theme {
+  --color-primary: #3b82f6;
+  --color-primary-dark: #2563eb;
+  --color-primary-light: #dbeafe;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-purple: #8b5cf6;
+  --color-orange: #f97316;
+
+  --color-bg: var(--bg);
+  --color-card: var(--card-bg);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-border: var(--border);
+
+  --radius-card: 16px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+}
+
+/* ─── Dark mode via [data-theme="dark"] ─── */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

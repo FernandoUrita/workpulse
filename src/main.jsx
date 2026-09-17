@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 
 // Global styles
+import './styles/tailwind.css'
 import './styles/globals.css'
 import './styles/components.css'
 import './styles/layout.css'
