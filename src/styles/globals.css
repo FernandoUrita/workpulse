@@ -43,7 +43,7 @@ body {
   font-family: 'Inter', -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: var(--transition);
+  transition: background-color 0.35s ease, color 0.35s ease;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
