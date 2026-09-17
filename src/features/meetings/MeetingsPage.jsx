@@ -161,10 +161,11 @@ export default function MeetingsPage() {
 
       {filtered.length === 0 ? (
         <div className="empty-state-enhanced">
-          <div className="empty-illustration">
+          <div className="empty-illustration meetings">
             <i className="fas fa-calendar-times"></i>
           </div>
-          <h3>No meetings found</h3>
+          <div className="empty-actions">{(search.trim() || filter !== 'all') && <button className="secondary-btn" onClick={() => { setSearch(''); setFilter('all'); }}>Clear filters</button>}</div>
+          <h3>{search.trim() || filter !== 'all' ? 'No matching meetings' : 'Plan your first meeting'}</h3>
           <p>
             {search ? 'No meetings match your search.' 
               : filter !== 'all' ? 'No meetings match this filter.'

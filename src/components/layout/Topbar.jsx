@@ -1,4 +1,4 @@
-import { useTheme } from '../../context/ThemeContext.jsx';
+import ThemeToggle from '../common/ThemeToggle.jsx';
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
@@ -10,7 +10,6 @@ const PAGE_TITLES = {
 };
 
 export default function Topbar({ currentPath, onMenuClick }) {
-  const { theme, toggleTheme } = useTheme();
 
   const today = new Date().toLocaleDateString('en-PH', {
     weekday: 'short',
@@ -24,16 +23,14 @@ export default function Topbar({ currentPath, onMenuClick }) {
   return (
     <header className="topbar">
       <div className="topbar-left">
-        <button className="mobile-menu-btn" onClick={onMenuClick}>
+        <button className="mobile-menu-btn" onClick={onMenuClick} aria-label="Open navigation">
           <i className="fas fa-bars"></i>
         </button>
         <h2>{title}</h2>
       </div>
       <div className="topbar-right">
         <span className="date-display">{today}</span>
-        <button className="icon-btn" onClick={toggleTheme}>
-          <i className={`fas fa-${theme === 'dark' ? 'sun' : 'moon'}`}></i>
-        </button>
+        <ThemeToggle />
       </div>
     </header>
   );

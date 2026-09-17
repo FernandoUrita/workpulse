@@ -1,14 +1,15 @@
+import { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import AppLayout from './components/layout/AppLayout.jsx';
 import LoginPage from './components/auth/LoginPage.jsx';
 import RegisterPage from './components/auth/RegisterPage.jsx';
-import DashboardPage from './features/dashboard/DashboardPage.jsx';
-import TasksPage from './features/tasks/TasksPage.jsx';
-import MeetingsPage from './features/meetings/MeetingsPage.jsx';
-import ItemsPage from './features/items/ItemsPage.jsx';
-import MomTemplatesPage from './features/mom/MomTemplatesPage.jsx';
-import SettingsPage from './features/settings/SettingsPage.jsx';
+const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage.jsx'));
+const TasksPage = lazy(() => import('./features/tasks/TasksPage.jsx'));
+const MeetingsPage = lazy(() => import('./features/meetings/MeetingsPage.jsx'));
+const ItemsPage = lazy(() => import('./features/items/ItemsPage.jsx'));
+const MomTemplatesPage = lazy(() => import('./features/mom/MomTemplatesPage.jsx'));
+const SettingsPage = lazy(() => import('./features/settings/SettingsPage.jsx'));
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();

@@ -141,13 +141,6 @@ export default function TasksPage() {
     }
   };
 
-  const toggleSelect = (id) => {
-    const next = new Set(selected);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelected(next);
-  };
-
   const selectAllOnPage = (e) => {
     if (e.target.checked) {
       const next = new Set(selected);
@@ -359,16 +352,45 @@ export default function TasksPage() {
 
       {paginated.length === 0 ? (
         <div className="empty-state-enhanced">
-          <div className="empty-illustration">
+          <div className="empty-illustration tasks">
             <i className="fas fa-clipboard-list"></i>
           </div>
-          <h3>No tasks found</h3>
+          <div className="empty-actions">{(search.trim() || filter !== 'all' || category !== 'all') && <button className="secondary-btn" onClick={() => { setSearch(''); setFilter('all'); setCategory('all'); setPage(1); }}>Clear filters</button>}</div>
+          <h3>
+            {search ? 'No tasks found'
+              : filter !== 'all' ? 'No tasks match this filter'
+              : dateNav.mode === 'today' ? 'No tasks for today'
+              : 'No tasks found'}
+          </h3>
           <p>
-            {search ? 'No tasks match your search.' 
-              : filter !== 'all' ? 'No tasks match this filter.'
-              : dateNav.mode === 'today' ? 'Wala kang tasks ngayong araw. Add one!'
+            {search ? 'Try a different search term or clear the search.'
+              : filter !== 'all' ? 'Try a different filter to see more tasks.'
+              : dateNav.mode === 'today' ? 'Wala kang tasks ngayong araw. Start by adding one!'
+              : dateNav.mode === 'tomorrow' ? 'Wala pang tasks para bukas. Plan ahead!'
+              : dateNav.mode === 'week' ? 'Walang tasks this week. Add one to get started.'
               : 'Add a task with this due date, or pick another date above.'}
           </p>
+
+          {!search && filter === 'all' && (
+            <div className="empty-suggestions">
+              <button className="suggestion-chip" onClick={handleAdd}>
+                <i className="fas fa-plus"></i> Create a Task
+              </button>
+              <button 
+                className="suggestion-chip" 
+                onClick={() => { setDateNav({ mode: 'tomorrow', activeDate: dateNav.activeDate }); setPage(1); }}
+              >
+                <i className="fas fa-calendar-plus"></i> Plan for Tomorrow
+              </button>
+              <button 
+                className="suggestion-chip" 
+                onClick={() => { setDateNav({ mode: 'all', activeDate: dateNav.activeDate }); setPage(1); }}
+              >
+                <i className="fas fa-layer-group"></i> View All Tasks
+              </button>
+            </div>
+          )}
+
           <button className="primary-btn" onClick={handleAdd}>
             <i className="fas fa-plus"></i> Add Task
           </button>

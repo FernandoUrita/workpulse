@@ -1,5 +1,6 @@
 import { useAppData } from '../../context/AppDataContext.jsx';
-import { escapeHtml, formatDate } from '../../utils/helpers.js';
+import { Link } from 'react-router-dom';
+import { escapeHtml } from '../../utils/helpers.js';
 
 export default function DashboardPage() {
   const { tasks, meetings, items } = useAppData();
@@ -142,7 +143,7 @@ export default function DashboardPage() {
           <h4><i className="fas fa-calendar-week"></i> Upcoming Meetings</h4>
           <div className="upcoming-meetings-list">
             {upcomingMeetings.length === 0 ? (
-              <p className="empty-msg">No upcoming meetings</p>
+              <div className="dashboard-empty"><i className="fas fa-calendar-plus" aria-hidden="true" /><p>Your calendar is clear.</p><Link className="primary-btn" to="/meetings">Plan a meeting</Link></div>
             ) : (
               upcomingMeetings.map(m => (
                 <div key={m.id} className="upcoming-meeting-item">
@@ -164,7 +165,7 @@ export default function DashboardPage() {
       <div className="recent-activity">
         <h4><i className="fas fa-clock"></i> Recent Activity</h4>
         {recentActivities.length === 0 ? (
-          <p className="empty-msg">No recent activity</p>
+          <div className="dashboard-empty"><i className="fas fa-clipboard-list" aria-hidden="true" /><p>Your work starts here. Add a task to begin tracking your progress.</p><Link className="primary-btn" to="/tasks">Go to tasks</Link></div>
         ) : (
           recentActivities.map(a => (
             <div key={a.id} className="activity-item">

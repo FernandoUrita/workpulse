@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { useTheme } from '../../context/ThemeContext.jsx';
+import ThemeToggle from '../common/ThemeToggle.jsx';
 import { useAppData } from '../../context/AppDataContext.jsx';
 
 const NAV_ITEMS = [
@@ -14,7 +14,6 @@ const NAV_ITEMS = [
 
 export default function Sidebar({ isOpen, onToggle }) {
   const { currentUser, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { tasks, meetings, items } = useAppData();
 
   const badges = {
@@ -30,7 +29,7 @@ export default function Sidebar({ isOpen, onToggle }) {
           <i className="fas fa-heartbeat"></i>
           <h2>Work<span>Pulse</span></h2>
         </div>
-        <button className="sidebar-toggle" onClick={onToggle}>
+        <button className="sidebar-toggle" onClick={onToggle} aria-label="Close navigation">
           <i className="fas fa-bars"></i>
         </button>
       </div>
@@ -54,6 +53,7 @@ export default function Sidebar({ isOpen, onToggle }) {
             <li key={item.path} className="nav-item">
               <NavLink 
                 to={item.path}
+                onClick={onToggle}
                 className={({ isActive }) => isActive ? 'active' : ''}
               >
                 <i className={`fas ${item.icon}`}></i>
@@ -69,9 +69,7 @@ export default function Sidebar({ isOpen, onToggle }) {
 
       <div className="sidebar-footer">
         <div className="version">v2.0.0</div>
-        <button className="theme-toggle-sidebar" onClick={toggleTheme}>
-          <i className={`fas fa-${theme === 'dark' ? 'sun' : 'moon'}`}></i>
-        </button>
+        <ThemeToggle className="theme-toggle-sidebar" />
       </div>
     </aside>
   );

@@ -7,6 +7,7 @@ import App from './App.jsx'
 import './styles/globals.css'
 import './styles/components.css'
 import './styles/layout.css'
+import './styles/polish.css'
 
 // Context Providers
 import { ToastProvider } from './context/ToastContext.jsx'

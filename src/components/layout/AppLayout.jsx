@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar.jsx';
 import Topbar from './Topbar.jsx';
+import PageSkeleton from '../common/PageSkeleton.jsx';
+import { useAppData } from '../../context/AppDataContext.jsx';
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const { loading } = useAppData();
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
   const closeSidebar = () => setSidebarOpen(false);
@@ -34,7 +37,11 @@ export default function AppLayout() {
           currentPath={location.pathname} 
           onMenuClick={toggleSidebar} 
         />
-        <Outlet />
+        <div key={location.pathname} className="page-transition">
+          <Suspense fallback={<PageSkeleton />}>
+            {loading ? <PageSkeleton /> : <Outlet />}
+          </Suspense>
+        </div>
       </main>
     </div>
   );

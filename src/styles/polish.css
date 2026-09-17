@@ -1,0 +1,36 @@
+/* Phase 1: shared interaction and accessibility polish. */
+.page-transition { animation: page-enter 220ms ease-out; }
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.theme-switch { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
+.theme-switch svg { animation: theme-enter 180ms ease-out; }
+@keyframes theme-enter { from { opacity: .4; transform: rotate(-25deg); } to { opacity: 1; transform: rotate(0); } }
+:where(button, a, input, select, textarea):focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }
+:where(.primary-btn, .secondary-btn, .icon-btn, .theme-toggle-sidebar, .filter-btn, .suggestion-chip) {
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+@media (hover: hover) {
+  :where(.primary-btn, .secondary-btn, .icon-btn, .theme-toggle-sidebar):not(:disabled):hover { transform: translateY(-2px); }
+}
+:where(.primary-btn, .secondary-btn, .icon-btn, .theme-toggle-sidebar, .suggestion-chip):not(:disabled):active { transform: translateY(0) scale(.98); }
+button:disabled { cursor: not-allowed; transform: none; }
+.dashboard-empty { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; text-align: center; }
+.dashboard-empty > i { font-size: 28px; color: var(--primary); }
+.dashboard-empty p { color: var(--text-secondary); line-height: 1.6; max-width: 440px; }
+.empty-actions { display: flex; justify-content: center; margin-bottom: 16px; }
+.empty-actions:empty { display: none; }
+.empty-state-enhanced .empty-illustration { animation: none; }
+.empty-state-enhanced::before { animation: none; }
+.page-skeleton-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 24px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+@media (max-width: 640px) {
+  .page-skeleton-cards { grid-template-columns: 1fr; }
+  .empty-state-enhanced { padding: 32px 16px; }
+  .empty-state-enhanced .empty-illustration { width: 72px; height: 72px; font-size: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+.page-transition > .module { animation: none; }

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
-import { ITEM_TYPE_CONFIG } from '../../utils/constants.js';
+
 import ItemCard from './ItemCard.jsx';
 import ItemModal from './ItemModal.jsx';
 import ItemDetailModal from './ItemDetailModal.jsx';
@@ -270,10 +270,11 @@ export default function ItemsPage() {
       {/* Items List */}
       {paginated.length === 0 ? (
         <div className="empty-state-enhanced">
-          <div className="empty-illustration">
+          <div className="empty-illustration items">
             <i className="fas fa-boxes-stacked"></i>
           </div>
-          <h3>No items found</h3>
+          <h3>{items.length === 0 ? 'Track your first item' : 'No matching items'}</h3>
+          {(search.trim() || activeTab !== 'all' || statusFilter !== 'all' || priorityFilter !== 'all') && <div className="empty-actions"><button className="secondary-btn" onClick={() => { setSearch(''); setActiveTab('all'); setStatusFilter('all'); setPriorityFilter('all'); setPage(1); }}>Clear filters</button></div>}
           <p>{emptyMessage}</p>
           <button className="primary-btn" onClick={handleAdd}>
             <i className="fas fa-plus"></i> Add Item
