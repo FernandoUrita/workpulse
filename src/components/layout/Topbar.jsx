@@ -1,4 +1,5 @@
 import ThemeToggle from '../common/ThemeToggle.jsx';
+import NotificationBell from '../common/NotificationBell.jsx';
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
@@ -39,6 +40,7 @@ export default function Topbar({ currentPath, onMenuClick, onOpenCommandPalette 
           <span className="cmd-trigger-text">Search…</span>
           <kbd className="cmd-trigger-kbd">Ctrl K</kbd>
         </button>
+        <NotificationBell />
         <span className="date-display">{today}</span>
         <ThemeToggle />
       </div>
