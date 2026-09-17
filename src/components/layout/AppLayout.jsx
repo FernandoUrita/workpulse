@@ -5,12 +5,15 @@ import Topbar from './Topbar.jsx';
 import PwaControls from '../common/PwaControls.jsx';
 import PageSkeleton from '../common/PageSkeleton.jsx';
 import PageTransition from '../common/PageTransition.jsx';
+import CommandPalette from '../common/CommandPalette.jsx';
+import { useCommandPalette } from '../../hooks/useCommandPalette.js';
 import { useAppData } from '../../context/AppDataContext.jsx';
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const { loading } = useAppData();
+  const { open: paletteOpen, setOpen: setPaletteOpen } = useCommandPalette();
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
   const closeSidebar = () => setSidebarOpen(false);
@@ -36,6 +39,7 @@ export default function AppLayout() {
         <Topbar
           currentPath={location.pathname}
           onMenuClick={toggleSidebar}
+          onOpenCommandPalette={() => setPaletteOpen(true)}
         />
         <PwaControls />
         <PageTransition routeKey={location.pathname}>
@@ -44,6 +48,8 @@ export default function AppLayout() {
           </Suspense>
         </PageTransition>
       </main>
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );
 }

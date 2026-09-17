@@ -9,8 +9,7 @@ const PAGE_TITLES = {
   '/settings': 'Settings',
 };
 
-export default function Topbar({ currentPath, onMenuClick }) {
-
+export default function Topbar({ currentPath, onMenuClick, onOpenCommandPalette }) {
   const today = new Date().toLocaleDateString('en-PH', {
     weekday: 'short',
     month: 'short',
@@ -29,6 +28,17 @@ export default function Topbar({ currentPath, onMenuClick }) {
         <h2>{title}</h2>
       </div>
       <div className="topbar-right">
+        <button
+          type="button"
+          className="cmd-trigger"
+          onClick={onOpenCommandPalette}
+          aria-label="Open command palette"
+          title="Open command palette (Ctrl+K)"
+        >
+          <i className="fas fa-search"></i>
+          <span className="cmd-trigger-text">Search…</span>
+          <kbd className="cmd-trigger-kbd">Ctrl K</kbd>
+        </button>
         <span className="date-display">{today}</span>
         <ThemeToggle />
       </div>
