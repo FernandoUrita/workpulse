@@ -34,3 +34,6 @@ button:disabled { cursor: not-allowed; transform: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 .page-transition > .module { animation: none; }
+
+/* Framer Motion handles page transitions now */
+.page-transition { animation: none !important; }

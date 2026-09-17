@@ -4,6 +4,7 @@ import Sidebar from './Sidebar.jsx';
 import Topbar from './Topbar.jsx';
 import PwaControls from '../common/PwaControls.jsx';
 import PageSkeleton from '../common/PageSkeleton.jsx';
+import PageTransition from '../common/PageTransition.jsx';
 import { useAppData } from '../../context/AppDataContext.jsx';
 
 export default function AppLayout() {
@@ -17,33 +18,31 @@ export default function AppLayout() {
   return (
     <div className="app-container">
       <Sidebar isOpen={sidebarOpen} onToggle={closeSidebar} />
-      
-      {/* Overlay for mobile when sidebar open */}
+
       {sidebarOpen && (
-        <div 
+        <div
           onClick={closeSidebar}
+          className="sidebar-overlay"
           style={{
             position: 'fixed',
             inset: 0,
             background: 'rgba(0,0,0,0.4)',
             zIndex: 99,
-            display: 'none',
           }}
-          className="sidebar-overlay"
         />
       )}
 
       <main className="main-content">
-        <Topbar 
-          currentPath={location.pathname} 
-          onMenuClick={toggleSidebar} 
+        <Topbar
+          currentPath={location.pathname}
+          onMenuClick={toggleSidebar}
         />
         <PwaControls />
-        <div key={location.pathname} className="page-transition">
+        <PageTransition routeKey={location.pathname}>
           <Suspense fallback={<PageSkeleton />}>
             {loading ? <PageSkeleton /> : <Outlet />}
           </Suspense>
-        </div>
+        </PageTransition>
       </main>
     </div>
   );
