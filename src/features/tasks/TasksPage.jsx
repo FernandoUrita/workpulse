@@ -12,6 +12,7 @@ import DateNavigator from './DateNavigator.jsx';
 import TaskCard from './TaskCard.jsx';
 import TaskModal from './TaskModal.jsx';
 import TaskDetailModal from './TaskDetailModal.jsx';
+import KanbanBoard from './KanbanBoard.jsx';
 import ConfirmModal from '../../components/common/ConfirmModal.jsx';
 import Pagination from '../../components/common/Pagination.jsx';
 
@@ -41,6 +42,7 @@ export default function TasksPage() {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [detailTask, setDetailTask] = useState(null);
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'kanban'
   const [deletingTask, setDeletingTask] = useState(null);
 
   // ─── HANDLE ?open=id FROM URL (notification click) ───
@@ -232,6 +234,24 @@ export default function TasksPage() {
       <div className="module-header">
         <h3><i className="fas fa-tasks"></i> Task Management</h3>
         <div className="module-actions">
+          <div className="view-toggle">
+            <button
+              type="button"
+              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              title="List view"
+            >
+              <i className="fas fa-list"></i>
+            </button>
+            <button
+              type="button"
+              className={`view-toggle-btn ${viewMode === 'kanban' ? 'active' : ''}`}
+              onClick={() => setViewMode('kanban')}
+              title="Kanban view"
+            >
+              <i className="fas fa-columns"></i>
+            </button>
+          </div>
           <button className="primary-btn" onClick={handleAdd}>
             <i className="fas fa-plus"></i> Add Task
           </button>
@@ -363,7 +383,10 @@ export default function TasksPage() {
           </button>
         </div>
       )}
-
+      {viewMode === 'kanban' ? (
+        <KanbanBoard tasks={filtered} onView={setDetailTask} />
+      ) : (
+        <>
       {filtered.length > 0 && (
         <div className="select-all-wrapper">
           <input
@@ -443,7 +466,8 @@ export default function TasksPage() {
           />
         </>
       )}
-
+      </>
+    )}
       <TaskModal
         show={showTaskModal}
         task={editingTask}

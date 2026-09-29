@@ -261,6 +261,36 @@ export function AppDataProvider({ children }) {
     });
     saveData({ ...data, tasks: newTasks });
   }, [data, saveData, currentUser]);
+  
+  // ─── MOVE TASK TO KANBAN COLUMN ────────────────
+  const moveTaskToColumn = useCallback((taskId, newStatus) => {
+    const newTasks = data.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      const oldStatus = t.kanbanStatus || 'todo';
+      if (oldStatus === newStatus) return t;
+
+      const isDone = newStatus === 'done';
+      const auditEntry = {
+        id: Date.now() + Math.random(),
+        action: 'updated',
+        user: currentUser?.username || 'system',
+        timestamp: Date.now(),
+        changes: {
+          kanbanStatus: { from: oldStatus, to: newStatus },
+          done: { from: t.done, to: isDone },
+        },
+      };
+
+      return {
+        ...t,
+        kanbanStatus: newStatus,
+        done: isDone,
+        updatedAt: Date.now(),
+        auditLog: [...(t.auditLog || []), auditEntry],
+      };
+    });
+    saveData({ ...data, tasks: newTasks });
+  }, [data, saveData, currentUser]);
 
   const bulkDeleteTasks = useCallback((ids) => {
     const newTasks = data.tasks.filter(t => !ids.includes(t.id));
@@ -466,6 +496,7 @@ export function AppDataProvider({ children }) {
       updateTask,
       deleteTask,
       toggleTask,
+      moveTaskToColumn,    // ← BAGONG LINE
       bulkDeleteTasks,
       bulkCompleteTasks,
       // Remarks
