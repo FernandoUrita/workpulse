@@ -3716,3 +3716,470 @@
     opacity: 1;
   }
 }
+
+/* ═══════════════════════════════════════════════ */
+/* ─── TASK DETAIL TABS ────────────────────────── */
+/* ═══════════════════════════════════════════════ */
+
+.task-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.task-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.task-tab:hover {
+  color: var(--text);
+  background: var(--card-bg);
+}
+
+.task-tab.active {
+  background: var(--card-bg);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .task-tab.active {
+  background: #1e293b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.task-tab > i {
+  font-size: 12px;
+}
+
+.task-tab-count {
+  background: var(--border);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.task-tab.active .task-tab-count {
+  background: var(--primary);
+  color: white;
+}
+
+.task-tab-content {
+  min-height: 200px;
+}
+
+/* ═══════════════════════════════════════════════ */
+/* ─── REMARKS SECTION ─────────────────────────── */
+/* ═══════════════════════════════════════════════ */
+
+.task-remarks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.remark-form {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.remark-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 70px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.remark-form textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.remark-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.remark-char-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.remark-form .primary-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.remark-form .primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── REMARKS LIST ─── */
+.remarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.remark-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 12px;
+  border-left: 3px solid var(--primary);
+  transition: border-color 0.15s ease;
+  position: relative;
+}
+
+.remark-item:hover {
+  border-left-color: var(--primary-dark);
+}
+
+.remark-avatar {
+  font-size: 28px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.remark-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.remark-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.remark-meta strong {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.remark-time {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.remark-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.remark-delete {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.remark-item:hover .remark-delete {
+  opacity: 1;
+}
+
+.remark-delete:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+[data-theme="dark"] .remark-delete:hover {
+  background: rgba(239, 68, 68, 0.25);
+}
+
+/* ─── EMPTY STATE (Remarks + History) ─── */
+.remarks-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.remarks-empty > i {
+  font-size: 32px;
+  color: var(--text-secondary);
+  opacity: 0.4;
+  margin-bottom: 6px;
+}
+
+.remarks-empty p {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.remarks-empty span {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ═══════════════════════════════════════════════ */
+/* ─── HISTORY / AUDIT LOG ─────────────────────── */
+/* ═══════════════════════════════════════════════ */
+
+.task-history {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  padding-left: 8px;
+}
+
+.history-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  position: relative;
+}
+
+.history-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 42px;
+  bottom: -4px;
+  width: 2px;
+  background: var(--border);
+}
+
+.history-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="dark"] .history-icon {
+  background: #1e3a5f;
+}
+
+.history-content {
+  flex: 1;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.history-action {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.history-action strong {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.history-changes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  border-left: 3px solid var(--warning);
+}
+
+.history-change {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.change-field {
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.change-from {
+  color: var(--danger);
+  text-decoration: line-through;
+  opacity: 0.7;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-change > i {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.change-to {
+  color: var(--success);
+  font-weight: 600;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-time {
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+/* ─── MOBILE ─── */
+@media (max-width: 640px) {
+  .task-tab {
+    padding: 8px 6px;
+    font-size: 12px;
+    gap: 4px;
+  }
+  .task-tab > span:not(.task-tab-count) {
+    display: none;
+  }
+  .task-tab > i {
+    font-size: 14px;
+  }
+  .remark-avatar {
+    font-size: 24px;
+  }
+  .remark-delete {
+    opacity: 1;
+  }
+}
+
+/* ─── SCROLLABLE REMARKS / HISTORY ─── */
+.remarks-list,
+.history-list {
+  max-height: 350px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.remarks-list::-webkit-scrollbar,
+.history-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.remarks-list::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.remarks-list::-webkit-scrollbar-thumb:hover,
+.history-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ─── LOAD MORE BUTTON ─── */
+.load-more-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-top: 12px;
+  border-radius: 10px;
+  border: 1.5px dashed var(--border);
+  background: transparent;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.load-more-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+[data-theme="dark"] .load-more-btn:hover {
+  background: #1e3a5f;
+}
+
+.load-more-btn > i {
+  font-size: 11px;
+}
+
+/* ─── ITEMS SHOWN FOOTER ─── */
+.items-shown-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 8px 0 0;
+  opacity: 0.7;
+}

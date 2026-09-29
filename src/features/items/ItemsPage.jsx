@@ -57,6 +57,16 @@ export default function ItemsPage() {
       setSearchParams(next, { replace: true });
     }
   }, [searchParams, items, setSearchParams]);
+
+  
+  // ─── SYNC DETAIL ITEM WITH LATEST DATA ───
+  useEffect(() => {
+    if (!detailItem) return;
+    const updated = items.find(i => i.id === detailItem.id);
+    if (updated && updated !== detailItem) {
+      setDetailItem(updated);
+    }
+  }, [items, detailItem]);
   
   const [deletingItem, setDeletingItem] = useState(null);
 

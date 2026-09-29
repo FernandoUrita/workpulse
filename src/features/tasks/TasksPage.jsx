@@ -59,6 +59,16 @@ export default function TasksPage() {
     }
   }, [searchParams, tasks, setSearchParams]);
 
+  
+  // ─── SYNC DETAIL TASK WITH LATEST DATA ───
+  useEffect(() => {
+    if (!detailTask) return;
+    const updated = tasks.find(t => t.id === detailTask.id);
+    if (updated && updated !== detailTask) {
+      setDetailTask(updated);
+    }
+  }, [tasks, detailTask]);
+
   const dateScoped = useMemo(() =>
     getDateFilteredTasks(tasks, dateNav.mode, dateNav.activeDate), 
     [tasks, dateNav]

@@ -42,6 +42,16 @@ export default function MeetingsPage() {
       setSearchParams(next, { replace: true });
     }
   }, [searchParams, meetings, setSearchParams]);
+
+  
+  // ─── SYNC VIEWING MEETING WITH LATEST DATA ───
+  useEffect(() => {
+    if (!viewingMom) return;
+    const updated = meetings.find(m => m.id === viewingMom.id);
+    if (updated && updated !== viewingMom) {
+      setViewingMom(updated);
+    }
+  }, [meetings, viewingMom]);
   
   const [deletingMeeting, setDeletingMeeting] = useState(null);
 
