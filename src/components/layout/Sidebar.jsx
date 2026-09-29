@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { path: '/meetings', label: 'Meetings', icon: 'fa-calendar-alt', badgeKey: 'meetings' },
   { path: '/items', label: 'Items', icon: 'fa-box', badgeKey: 'items' },
   { path: '/mom', label: 'MOM Templates', icon: 'fa-file-alt' },
+  { path: '/activity', label: 'Activity', icon: 'fa-stream' },
   { path: '/settings', label: 'Settings', icon: 'fa-cog' },
 ];
 

@@ -12,6 +12,7 @@ const MeetingsPage = lazy(() => import('./features/meetings/MeetingsPage.jsx'));
 const ItemsPage = lazy(() => import('./features/items/ItemsPage.jsx'));
 const MomTemplatesPage = lazy(() => import('./features/mom/MomTemplatesPage.jsx'));
 const SettingsPage = lazy(() => import('./features/settings/SettingsPage.jsx'));
+const ActivityPage = lazy(() => import('./features/activity/ActivityPage.jsx'));
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -99,6 +100,7 @@ export default function App() {
           <Route path="/items" element={<ItemsPage />} />
           <Route path="/mom" element={<MomTemplatesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/activity" element={<ActivityPage />} />
         </Route>
 
         {/* Default redirect */}
