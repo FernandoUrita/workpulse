@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { 
@@ -42,7 +43,23 @@ export default function TasksPage() {
   const [detailTask, setDetailTask] = useState(null);
   const [deletingTask, setDeletingTask] = useState(null);
 
-  const dateScoped = useMemo(() => 
+  // ─── HANDLE ?open=id FROM URL (notification click) ───
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const openId = searchParams.get('open');
+    if (!openId) return;
+    const task = tasks.find(t => String(t.id) === openId);
+    if (task) {
+      setDetailTask(task);
+      // Clear the param so it doesn't re-open on reload
+      const next = new URLSearchParams(searchParams);
+      next.delete('open');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, tasks, setSearchParams]);
+
+  const dateScoped = useMemo(() =>
     getDateFilteredTasks(tasks, dateNav.mode, dateNav.activeDate), 
     [tasks, dateNav]
   );

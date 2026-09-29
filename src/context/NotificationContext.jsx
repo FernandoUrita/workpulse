@@ -4,7 +4,8 @@ import { isOverdue, isDueToday } from '../utils/helpers.js';
 
 const NotificationContext = createContext(null);
 
-const STORAGE_KEY = 'workpulse_notifications_read';
+const READ_KEY = 'workpulse_notifications_read';
+const DISMISSED_KEY = 'workpulse_notifications_dismissed';
 
 function buildNotifications(tasks, meetings, items) {
   const list = [];
@@ -17,6 +18,9 @@ function buildNotifications(tasks, meetings, items) {
       list.push({
         id: `task-overdue-${t.id}`,
         type: 'task',
+        targetId: t.id,
+        targetType: 'task',
+        path: `/tasks?open=${t.id}`,
         severity: 'danger',
         icon: 'fa-exclamation-triangle',
         title: 'Task overdue',
@@ -27,6 +31,9 @@ function buildNotifications(tasks, meetings, items) {
       list.push({
         id: `task-today-${t.id}`,
         type: 'task',
+        targetId: t.id,
+        targetType: 'task',
+        path: `/tasks?open=${t.id}`,
         severity: 'warning',
         icon: 'fa-clock',
         title: 'Task due today',
@@ -45,6 +52,9 @@ function buildNotifications(tasks, meetings, items) {
       list.push({
         id: `meeting-${m.id}`,
         type: 'meeting',
+        targetId: m.id,
+        targetType: 'meeting',
+        path: `/meetings?open=${m.id}`,
         severity: 'info',
         icon: 'fa-calendar-alt',
         title: 'Upcoming meeting',
@@ -62,57 +72,88 @@ function buildNotifications(tasks, meetings, items) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
+    const label = i.text || i.title || 'Untitled item';
     if (diffDays < 0) {
       list.push({
         id: `item-overdue-${i.id}`,
         type: 'item',
+        targetId: i.id,
+        targetType: 'item',
+        path: `/items?open=${i.id}`,
         severity: 'danger',
         icon: 'fa-exclamation-circle',
         title: 'Check-in overdue',
-        message: i.text || i.title || 'Untitled item',
+        message: label,
         timestamp: next.getTime(),
       });
     } else if (diffDays <= 2) {
       list.push({
         id: `item-checkin-${i.id}`,
         type: 'item',
+        targetId: i.id,
+        targetType: 'item',
+        path: `/items?open=${i.id}`,
         severity: 'warning',
         icon: 'fa-clipboard-check',
         title: 'Check-in due soon',
-        message: i.text || i.title || 'Untitled item',
+        message: label,
         timestamp: next.getTime(),
       });
     }
   });
 
-  // Sort: newest first
   return list.sort((a, b) => b.timestamp - a.timestamp);
+}
+
+function loadSet(key) {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSet(key, set) {
+  try {
+    localStorage.setItem(key, JSON.stringify(Array.from(set)));
+  } catch (e) {
+    console.error(`Failed to save ${key}:`, e);
+  }
 }
 
 export function NotificationProvider({ children }) {
   const { tasks, meetings, items } = useAppData();
-  const [readIds, setReadIds] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? new Set(JSON.parse(saved)) : new Set();
-    } catch {
-      return new Set();
-    }
-  });
+  const [readIds, setReadIds] = useState(() => loadSet(READ_KEY));
+  const [dismissedIds, setDismissedIds] = useState(() => loadSet(DISMISSED_KEY));
 
-  // Persist read IDs
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(readIds)));
-    } catch (e) {
-      console.error('Failed to save notifications:', e);
-    }
-  }, [readIds]);
-
-  const notifications = useMemo(
+  const allNotifications = useMemo(
     () => buildNotifications(tasks, meetings, items),
     [tasks, meetings, items]
   );
+
+  // Filter out dismissed
+  const notifications = useMemo(
+    () => allNotifications.filter(n => !dismissedIds.has(n.id)),
+    [allNotifications, dismissedIds]
+  );
+
+  // ─── AUTO-CLEANUP STALE IDS ────────────────────
+  useEffect(() => {
+    const currentIds = new Set(allNotifications.map(n => n.id));
+    setReadIds(prev => {
+      const cleaned = new Set([...prev].filter(id => currentIds.has(id)));
+      return cleaned.size !== prev.size ? cleaned : prev;
+    });
+    setDismissedIds(prev => {
+      const cleaned = new Set([...prev].filter(id => currentIds.has(id)));
+      return cleaned.size !== prev.size ? cleaned : prev;
+    });
+  }, [allNotifications]);
+
+  // Persist
+  useEffect(() => { saveSet(READ_KEY, readIds); }, [readIds]);
+  useEffect(() => { saveSet(DISMISSED_KEY, dismissedIds); }, [dismissedIds]);
 
   const unreadCount = useMemo(
     () => notifications.filter(n => !readIds.has(n.id)).length,
@@ -127,8 +168,16 @@ export function NotificationProvider({ children }) {
     setReadIds(new Set(notifications.map(n => n.id)));
   };
 
-  const clearAll = () => {
-    markAllAsRead();
+  const dismiss = (id) => {
+    setDismissedIds(prev => new Set(prev).add(id));
+  };
+
+  const dismissAll = () => {
+    setDismissedIds(prev => {
+      const next = new Set(prev);
+      notifications.forEach(n => next.add(n.id));
+      return next;
+    });
   };
 
   return (
@@ -136,9 +185,11 @@ export function NotificationProvider({ children }) {
       notifications,
       unreadCount,
       readIds,
+      dismissedIds,
       markAsRead,
       markAllAsRead,
-      clearAll,
+      dismiss,
+      dismissAll,
     }}>
       {children}
     </NotificationContext.Provider>

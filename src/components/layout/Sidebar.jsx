@@ -16,10 +16,11 @@ export default function Sidebar({ isOpen, onToggle }) {
   const { currentUser, logout } = useAuth();
   const { tasks, meetings, items } = useAppData();
 
+  // Badge: bilangin lang yung PENDING (hindi completed) tasks
   const badges = {
-    tasks: tasks.length,
-    meetings: meetings.length,
-    items: items.length,
+    tasks: tasks.filter(t => !t.done).length,
+    meetings: meetings.filter(m => !m.completed).length,
+    items: items.filter(i => i.status !== 'completed' && i.status !== 'cancelled').length,
   };
 
   return (
@@ -51,7 +52,7 @@ export default function Sidebar({ isOpen, onToggle }) {
         <ul>
           {NAV_ITEMS.map(item => (
             <li key={item.path} className="nav-item">
-              <NavLink 
+              <NavLink
                 to={item.path}
                 onClick={onToggle}
                 className={({ isActive }) => isActive ? 'active' : ''}

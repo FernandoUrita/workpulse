@@ -11,7 +11,7 @@ Hi, Team,
 
 Good day.
 
-This is to document our meeting earlier. Please see below details 
+This is to document our meeting earlier. Please see below details
 for your reference.
 
 --------------------------------------------------------------------
@@ -64,6 +64,80 @@ Date: ___________________
 
 Thank you.`;
 
+// ─── MIGRATION HELPERS ──────────────────────────
+function migrateTask(task, fallbackUser) {
+  const migrated = { ...task };
+
+  // assignee (string) → assignees (array)
+  if (!Array.isArray(migrated.assignees)) {
+    if (typeof migrated.assignee === 'string' && migrated.assignee.trim()) {
+      migrated.assignees = [migrated.assignee.trim()];
+    } else {
+      migrated.assignees = [];
+    }
+  }
+  delete migrated.assignee;
+
+  // createdBy
+  if (!migrated.createdBy) {
+    migrated.createdBy = fallbackUser || 'admin';
+  }
+
+  // remarks array
+  if (!Array.isArray(migrated.remarks)) {
+    migrated.remarks = [];
+  }
+
+  // auditLog array
+  if (!Array.isArray(migrated.auditLog)) {
+    migrated.auditLog = [];
+  }
+
+  // kanbanStatus (for future B6)
+  if (!migrated.kanbanStatus) {
+    migrated.kanbanStatus = migrated.done ? 'done' : 'todo';
+  }
+
+  return migrated;
+}
+
+function migrateData(data, fallbackUser) {
+  return {
+    tasks: (data.tasks || []).map(t => migrateTask(t, fallbackUser)),
+    meetings: data.meetings || [],
+    items: data.items || [],
+    momTemplate: data.momTemplate || DEFAULT_MOM_TEMPLATE,
+  };
+}
+
+// ─── AUDIT HELPERS ──────────────────────────────
+function makeAuditEntry(action, user, changes = null) {
+  return {
+    id: Date.now() + Math.random(),
+    action,
+    user: user || 'system',
+    timestamp: Date.now(),
+    changes,
+  };
+}
+
+function computeChanges(oldTask, updates) {
+  const changes = {};
+  const fields = ['text', 'description', 'priority', 'category', 'dueDate', 'assignees', 'done', 'kanbanStatus'];
+  fields.forEach(f => {
+    if (f in updates) {
+      const oldVal = oldTask[f];
+      const newVal = updates[f];
+      const oldStr = JSON.stringify(oldVal);
+      const newStr = JSON.stringify(newVal);
+      if (oldStr !== newStr) {
+        changes[f] = { from: oldVal, to: newVal };
+      }
+    }
+  });
+  return Object.keys(changes).length > 0 ? changes : null;
+}
+
 export function AppDataProvider({ children }) {
   const { currentUser } = useAuth();
   const [data, setData] = useState({
@@ -92,12 +166,10 @@ export function AppDataProvider({ children }) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setData({
-          tasks: parsed.tasks || [],
-          meetings: parsed.meetings || [],
-          items: parsed.items || [],
-          momTemplate: parsed.momTemplate || DEFAULT_MOM_TEMPLATE,
-        });
+        const migrated = migrateData(parsed, currentUser.username);
+        setData(migrated);
+        // Save migrated data back
+        localStorage.setItem(key, JSON.stringify(migrated));
       } catch (e) {
         console.error('Error loading data:', e);
       }
@@ -130,22 +202,39 @@ export function AppDataProvider({ children }) {
       priority: task.priority || 'medium',
       category: task.category || 'work',
       dueDate: task.dueDate || '',
-      assignee: task.assignee || '',
+      assignees: Array.isArray(task.assignees) ? task.assignees : [],
       done: false,
+      kanbanStatus: 'todo',
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      createdBy: currentUser?.username || 'unknown',
+      remarks: [],
+      auditLog: [makeAuditEntry('created', currentUser?.username)],
     };
     const newData = { ...data, tasks: [...data.tasks, newTask] };
     saveData(newData);
     return newTask;
-  }, [data, saveData]);
+  }, [data, saveData, currentUser]);
 
   const updateTask = useCallback((id, updates) => {
-    const newTasks = data.tasks.map(t => 
-      t.id === id ? { ...t, ...updates, updatedAt: Date.now() } : t
-    );
+    const oldTask = data.tasks.find(t => t.id === id);
+    if (!oldTask) return;
+
+    const changes = computeChanges(oldTask, updates);
+
+    const newTasks = data.tasks.map(t => {
+      if (t.id !== id) return t;
+      const updated = { ...t, ...updates, updatedAt: Date.now() };
+      if (changes) {
+        updated.auditLog = [
+          ...(t.auditLog || []),
+          makeAuditEntry('updated', currentUser?.username, changes),
+        ];
+      }
+      return updated;
+    });
     saveData({ ...data, tasks: newTasks });
-  }, [data, saveData]);
+  }, [data, saveData, currentUser]);
 
   const deleteTask = useCallback((id) => {
     const newTasks = data.tasks.filter(t => t.id !== id);
@@ -153,11 +242,25 @@ export function AppDataProvider({ children }) {
   }, [data, saveData]);
 
   const toggleTask = useCallback((id) => {
-    const newTasks = data.tasks.map(t => 
-      t.id === id ? { ...t, done: !t.done, updatedAt: Date.now() } : t
-    );
+    const oldTask = data.tasks.find(t => t.id === id);
+    if (!oldTask) return;
+
+    const newDone = !oldTask.done;
+    const newTasks = data.tasks.map(t => {
+      if (t.id !== id) return t;
+      return {
+        ...t,
+        done: newDone,
+        kanbanStatus: newDone ? 'done' : 'todo',
+        updatedAt: Date.now(),
+        auditLog: [
+          ...(t.auditLog || []),
+          makeAuditEntry(newDone ? 'completed' : 'reopened', currentUser?.username),
+        ],
+      };
+    });
     saveData({ ...data, tasks: newTasks });
-  }, [data, saveData]);
+  }, [data, saveData, currentUser]);
 
   const bulkDeleteTasks = useCallback((ids) => {
     const newTasks = data.tasks.filter(t => !ids.includes(t.id));
@@ -165,11 +268,98 @@ export function AppDataProvider({ children }) {
   }, [data, saveData]);
 
   const bulkCompleteTasks = useCallback((ids) => {
-    const newTasks = data.tasks.map(t => 
-      ids.includes(t.id) ? { ...t, done: true, updatedAt: Date.now() } : t
-    );
+    const newTasks = data.tasks.map(t => {
+      if (!ids.includes(t.id)) return t;
+      return {
+        ...t,
+        done: true,
+        kanbanStatus: 'done',
+        updatedAt: Date.now(),
+        auditLog: [
+          ...(t.auditLog || []),
+          makeAuditEntry('completed', currentUser?.username),
+        ],
+      };
+    });
+    saveData({ ...data, tasks: newTasks });
+  }, [data, saveData, currentUser]);
+
+  // ─── REMARKS ───────────────────────────────────
+  const addRemark = useCallback((taskId, text) => {
+    if (!text || !text.trim()) return;
+    const newTasks = data.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      const remark = {
+        id: Date.now() + Math.random(),
+        text: text.trim(),
+        author: currentUser?.username || 'unknown',
+        authorName: currentUser?.name || 'Unknown',
+        timestamp: Date.now(),
+      };
+      return {
+        ...t,
+        updatedAt: Date.now(),
+        remarks: [...(t.remarks || []), remark],
+        auditLog: [
+          ...(t.auditLog || []),
+          makeAuditEntry('remark_added', currentUser?.username),
+        ],
+      };
+    });
+    saveData({ ...data, tasks: newTasks });
+  }, [data, saveData, currentUser]);
+
+  const deleteRemark = useCallback((taskId, remarkId) => {
+    const newTasks = data.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      return {
+        ...t,
+        updatedAt: Date.now(),
+        remarks: (t.remarks || []).filter(r => r.id !== remarkId),
+      };
+    });
     saveData({ ...data, tasks: newTasks });
   }, [data, saveData]);
+
+  // ─── ASSIGNEES ─────────────────────────────────
+  const addAssignee = useCallback((taskId, username) => {
+    const newTasks = data.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      const current = t.assignees || [];
+      if (current.includes(username)) return t;
+      return {
+        ...t,
+        assignees: [...current, username],
+        updatedAt: Date.now(),
+        auditLog: [
+          ...(t.auditLog || []),
+          makeAuditEntry('assignee_added', currentUser?.username, {
+            assignees: { from: current, to: [...current, username] },
+          }),
+        ],
+      };
+    });
+    saveData({ ...data, tasks: newTasks });
+  }, [data, saveData, currentUser]);
+
+  const removeAssignee = useCallback((taskId, username) => {
+    const newTasks = data.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      const current = t.assignees || [];
+      return {
+        ...t,
+        assignees: current.filter(a => a !== username),
+        updatedAt: Date.now(),
+        auditLog: [
+          ...(t.auditLog || []),
+          makeAuditEntry('assignee_removed', currentUser?.username, {
+            assignees: { from: current, to: current.filter(a => a !== username) },
+          }),
+        ],
+      };
+    });
+    saveData({ ...data, tasks: newTasks });
+  }, [data, saveData, currentUser]);
 
   // ─── MEETINGS ──────────────────────────────────
   const addMeeting = useCallback((meeting) => {
@@ -186,7 +376,7 @@ export function AppDataProvider({ children }) {
   }, [data, saveData]);
 
   const updateMeeting = useCallback((id, updates) => {
-    const newMeetings = data.meetings.map(m => 
+    const newMeetings = data.meetings.map(m =>
       m.id === id ? { ...m, ...updates } : m
     );
     saveData({ ...data, meetings: newMeetings });
@@ -198,7 +388,7 @@ export function AppDataProvider({ children }) {
   }, [data, saveData]);
 
   const completeMeeting = useCallback((id, mom) => {
-    const newMeetings = data.meetings.map(m => 
+    const newMeetings = data.meetings.map(m =>
       m.id === id ? { ...m, completed: true, mom } : m
     );
     saveData({ ...data, meetings: newMeetings });
@@ -219,7 +409,7 @@ export function AppDataProvider({ children }) {
   }, [data, saveData]);
 
   const updateItem = useCallback((id, updates) => {
-    const newItems = data.items.map(i => 
+    const newItems = data.items.map(i =>
       i.id === id ? { ...i, ...updates, updatedAt: Date.now() } : i
     );
     saveData({ ...data, items: newItems });
@@ -278,6 +468,12 @@ export function AppDataProvider({ children }) {
       toggleTask,
       bulkDeleteTasks,
       bulkCompleteTasks,
+      // Remarks
+      addRemark,
+      deleteRemark,
+      // Assignees
+      addAssignee,
+      removeAssignee,
       // Meetings
       addMeeting,
       updateMeeting,

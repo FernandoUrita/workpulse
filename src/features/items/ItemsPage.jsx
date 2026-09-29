@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 
@@ -40,6 +41,23 @@ export default function ItemsPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [detailItem, setDetailItem] = useState(null);
   const [checkinItem, setCheckinItem] = useState(null);
+  
+  // ─── HANDLE ?open=id FROM URL (notification click) ───
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const openId = searchParams.get('open');
+    if (!openId) return;
+    const item = items.find(i => String(i.id) === openId);
+    if (item) {
+      setDetailItem(item);
+      // Clear the param so it doesn't re-open on reload
+      const next = new URLSearchParams(searchParams);
+      next.delete('open');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, items, setSearchParams]);
+  
   const [deletingItem, setDeletingItem] = useState(null);
 
   // ─── FILTERING ──────────────────────────────────

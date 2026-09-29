@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNotifications } from '../../context/NotificationContext.jsx';
 import { formatDateTime } from '../../utils/helpers.js';
@@ -10,12 +11,14 @@ export default function NotificationBell() {
     readIds,
     markAsRead,
     markAllAsRead,
+    dismiss,
+    dismissAll,
   } = useNotifications();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const panelRef = useRef(null);
   const buttonRef = useRef(null);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handleClick = (e) => {
@@ -37,8 +40,17 @@ export default function NotificationBell() {
     };
   }, [open]);
 
-  const handleItemClick = (id) => {
-    markAsRead(id);
+  const handleNotificationClick = (notification) => {
+    markAsRead(notification.id);
+    setOpen(false);
+    if (notification.path) {
+      navigate(notification.path);
+    }
+  };
+
+  const handleDismiss = (e, id) => {
+    e.stopPropagation();
+    dismiss(id);
   };
 
   return (
@@ -81,14 +93,26 @@ export default function NotificationBell() {
                   <span className="notif-header-count">{unreadCount}</span>
                 )}
               </h4>
-              {notifications.length > 0 && unreadCount > 0 && (
-                <button
-                  type="button"
-                  className="notif-mark-all"
-                  onClick={markAllAsRead}
-                >
-                  Mark all read
-                </button>
+              {notifications.length > 0 && (
+                <div className="notif-header-actions">
+                  {unreadCount > 0 && (
+                    <button
+                      type="button"
+                      className="notif-mark-all"
+                      onClick={markAllAsRead}
+                    >
+                      Mark all read
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="notif-mark-all"
+                    onClick={dismissAll}
+                    title="Clear all notifications"
+                  >
+                    Clear all
+                  </button>
+                </div>
               )}
             </div>
 
@@ -103,11 +127,18 @@ export default function NotificationBell() {
                 notifications.map(n => {
                   const isRead = readIds.has(n.id);
                   return (
-                    <button
+                    <div
                       key={n.id}
-                      type="button"
                       className={`notif-item ${n.severity} ${isRead ? 'read' : 'unread'}`}
-                      onClick={() => handleItemClick(n.id)}
+                      onClick={() => handleNotificationClick(n)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleNotificationClick(n);
+                        }
+                      }}
                     >
                       <div className={`notif-item-icon ${n.severity}`}>
                         <i className={`fas ${n.icon}`}></i>
@@ -120,7 +151,16 @@ export default function NotificationBell() {
                         </div>
                       </div>
                       {!isRead && <span className="notif-dot"></span>}
-                    </button>
+                      <button
+                        type="button"
+                        className="notif-dismiss"
+                        onClick={(e) => handleDismiss(e, n.id)}
+                        aria-label="Dismiss notification"
+                        title="Dismiss"
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </div>
                   );
                 })
               )}

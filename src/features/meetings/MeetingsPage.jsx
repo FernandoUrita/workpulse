@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { isMeetingPast } from '../../utils/helpers.js';
@@ -25,6 +26,23 @@ export default function MeetingsPage() {
   const [editingMeeting, setEditingMeeting] = useState(null);
   const [momMeeting, setMomMeeting] = useState(null);
   const [viewingMom, setViewingMom] = useState(null);
+  
+  // ─── HANDLE ?open=id FROM URL (notification click) ───
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const openId = searchParams.get('open');
+    if (!openId) return;
+    const meeting = meetings.find(m => String(m.id) === openId);
+    if (meeting) {
+      setViewingMom(meeting);
+      // Clear the param so it doesn't re-open on reload
+      const next = new URLSearchParams(searchParams);
+      next.delete('open');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, meetings, setSearchParams]);
+  
   const [deletingMeeting, setDeletingMeeting] = useState(null);
 
   // ─── FILTERING ──────────────────────────────────
