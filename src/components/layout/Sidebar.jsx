@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { path: '/tasks', label: 'Tasks', icon: 'fa-tasks', badgeKey: 'tasks' },
   { path: '/meetings', label: 'Meetings', icon: 'fa-calendar-alt', badgeKey: 'meetings' },
   { path: '/items', label: 'Items', icon: 'fa-box', badgeKey: 'items' },
+  { path: '/tickets', label: 'Tickets', icon: 'fa-ticket-alt', badgeKey: 'tickets' },    // ← BAGO
   { path: '/mom', label: 'MOM Templates', icon: 'fa-file-alt' },
   { path: '/activity', label: 'Activity', icon: 'fa-stream' },
   { path: '/settings', label: 'Settings', icon: 'fa-cog' },
@@ -15,13 +16,14 @@ const NAV_ITEMS = [
 
 export default function Sidebar({ isOpen, onToggle }) {
   const { currentUser, logout } = useAuth();
-  const { tasks, meetings, items } = useAppData();
+  const { tasks, meetings, items, tickets } = useAppData();
 
   // Badge: bilangin lang yung PENDING (hindi completed) tasks
   const badges = {
     tasks: tasks.filter(t => !t.done).length,
     meetings: meetings.filter(m => !m.completed).length,
     items: items.filter(i => i.status !== 'completed' && i.status !== 'cancelled').length,
+    tickets: (tickets || []).filter(t => t.status !== 'Closed' && t.status !== 'On Hold').length,
   };
 
   return (

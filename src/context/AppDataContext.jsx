@@ -106,6 +106,7 @@ function migrateData(data, fallbackUser) {
     tasks: (data.tasks || []).map(t => migrateTask(t, fallbackUser)),
     meetings: data.meetings || [],
     items: data.items || [],
+    tickets: data.tickets || [],
     momTemplate: data.momTemplate || DEFAULT_MOM_TEMPLATE,
   };
 }
@@ -144,6 +145,7 @@ export function AppDataProvider({ children }) {
     tasks: [],
     meetings: [],
     items: [],
+    tickets: [],
     momTemplate: DEFAULT_MOM_TEMPLATE,
   });
   const [loading, setLoading] = useState(true);
@@ -155,6 +157,7 @@ export function AppDataProvider({ children }) {
         tasks: [],
         meetings: [],
         items: [],
+        tickets: [],
         momTemplate: DEFAULT_MOM_TEMPLATE,
       });
       setLoading(false);
@@ -463,6 +466,106 @@ export function AppDataProvider({ children }) {
     saveData({ ...data, items: newItems });
   }, [data, saveData]);
 
+  // ─── TICKETS ───────────────────────────────────
+  const addTicket = useCallback((ticket) => {
+    const newTicket = {
+      id: `ticket-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      ticketNo: ticket.ticketNo || '',
+      clientName: ticket.clientName || '',
+      remarks: ticket.remarks || '',
+      subject: ticket.subject || '',
+      dateLastUpdate: ticket.dateLastUpdate || '',
+      pendingTo: ticket.pendingTo || 'Client',
+      status: ticket.status || 'Open',
+      timeline: ticket.timeline || '',
+      dateCreated: ticket.dateCreated || new Date().toISOString(),
+      category: ticket.category || 'Explanation',
+      priority: ticket.priority || 'Medium',
+      taskType: ticket.taskType || 'support',
+      auditLog: [{
+        id: Date.now() + Math.random(),
+        action: 'created',
+        user: currentUser?.username || 'system',
+        timestamp: Date.now(),
+      }],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    const newData = { ...data, tickets: [...(data.tickets || []), newTicket] };
+    saveData(newData);
+    return newTicket;
+  }, [data, saveData, currentUser]);
+
+  const updateTicket = useCallback((id, updates) => {
+    const oldTicket = (data.tickets || []).find(t => t.id === id);
+    if (!oldTicket) return;
+
+    const changes = {};
+    ['ticketNo', 'clientName', 'remarks', 'subject', 'status', 'category', 'priority', 'pendingTo', 'timeline', 'dateLastUpdate'].forEach(f => {
+      if (f in updates && updates[f] !== oldTicket[f]) {
+        changes[f] = { from: oldTicket[f], to: updates[f] };
+      }
+    });
+
+    const newTickets = (data.tickets || []).map(t => {
+      if (t.id !== id) return t;
+      const updated = { ...t, ...updates, updatedAt: Date.now() };
+      if (Object.keys(changes).length > 0) {
+        updated.auditLog = [
+          ...(t.auditLog || []),
+          {
+            id: Date.now() + Math.random(),
+            action: 'updated',
+            user: currentUser?.username || 'system',
+            timestamp: Date.now(),
+            changes,
+          },
+        ];
+      }
+      return updated;
+    });
+    saveData({ ...data, tickets: newTickets });
+  }, [data, saveData, currentUser]);
+
+  const deleteTicket = useCallback((id) => {
+    const newTickets = (data.tickets || []).filter(t => t.id !== id);
+    saveData({ ...data, tickets: newTickets });
+  }, [data, saveData]);
+
+  const bulkDeleteTickets = useCallback((ids) => {
+    const newTickets = (data.tickets || []).filter(t => !ids.includes(t.id));
+    saveData({ ...data, tickets: newTickets });
+  }, [data, saveData]);
+
+  const importTickets = useCallback((tickets) => {
+    const newTickets = tickets.map(ticket => ({
+      id: `ticket-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      ticketNo: ticket.ticketNo || '',
+      clientName: ticket.clientName || '',
+      remarks: ticket.remarks || '',
+      subject: ticket.subject || '',
+      dateLastUpdate: ticket.dateLastUpdate || '',
+      pendingTo: ticket.pendingTo || 'Client',
+      status: ticket.status || 'Open',
+      timeline: ticket.timeline || '',
+      dateCreated: ticket.dateCreated || new Date().toISOString(),
+      category: ticket.category || 'Explanation',
+      priority: ticket.priority || 'Medium',
+      taskType: ticket.taskType || 'support',
+      auditLog: [{
+        id: Date.now() + Math.random(),
+        action: 'imported',
+        user: currentUser?.username || 'system',
+        timestamp: Date.now(),
+      }],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }));
+    const newData = { ...data, tickets: [...(data.tickets || []), ...newTickets] };
+    saveData(newData);
+    return newTickets;
+  }, [data, saveData, currentUser]);
+
   // ─── MOM TEMPLATE ──────────────────────────────
   const updateMomTemplate = useCallback((template) => {
     saveData({ ...data, momTemplate: template });
@@ -478,6 +581,7 @@ export function AppDataProvider({ children }) {
       tasks: [],
       meetings: [],
       items: [],
+      tickets: [],
       momTemplate: DEFAULT_MOM_TEMPLATE,
     });
   }, [saveData]);
@@ -515,6 +619,13 @@ export function AppDataProvider({ children }) {
       updateItem,
       deleteItem,
       addCheckin,
+      // Tickets
+      tickets: data.tickets || [],
+      addTicket,
+      updateTicket,
+      deleteTicket,
+      bulkDeleteTickets,
+      importTickets,
       // MOM
       updateMomTemplate,
       resetMomTemplate,
