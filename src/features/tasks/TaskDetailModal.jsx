@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -15,6 +15,8 @@ export default function TaskDetailModal({ task, onClose, onToggle, onEdit, onDel
   // Pagination state
   const [visibleRemarks, setVisibleRemarks] = useState(10);
   const [visibleHistory, setVisibleHistory] = useState(20);
+  // History filter
+  const [historyFilter, setHistoryFilter] = useState('all');
 
   if (!task) return null;
 
@@ -33,12 +35,33 @@ export default function TaskDetailModal({ task, onClose, onToggle, onEdit, onDel
   const allRemarks = task.remarks || [];
   const allHistory = task.auditLog || [];
 
+  // History filter
+  const filteredHistory = useMemo(() => {
+    if (historyFilter === 'all') return allHistory;
+    if (historyFilter === 'updates') {
+      return allHistory.filter(e => e.action === 'updated');
+    }
+    if (historyFilter === 'remarks') {
+      return allHistory.filter(e => e.action === 'remark_added');
+    }
+    if (historyFilter === 'status') {
+      return allHistory.filter(e => e.action === 'completed' || e.action === 'reopened');
+    }
+    if (historyFilter === 'assignees') {
+      return allHistory.filter(e => e.action === 'assignee_added' || e.action === 'assignee_removed');
+    }
+    return allHistory;
+  }, [allHistory, historyFilter]);
+
   // Sliced for display
   const remarks = allRemarks.slice(-visibleRemarks); // Latest first (reverse)
-  const history = [...allHistory].reverse().slice(0, visibleHistory);
+  const history = [...filteredHistory].reverse().slice(0, visibleHistory);
 
   const hasMoreRemarks = allRemarks.length > visibleRemarks;
-  const hasMoreHistory = allHistory.length > visibleHistory;
+  const hasMoreHistory = filteredHistory.length > visibleHistory;
+
+  // Statistics
+  const uniqueUsers = new Set(allHistory.map(e => e.user)).size;
 
   const handleAddRemark = () => {
     if (!newRemark.trim()) {
@@ -238,10 +261,10 @@ export default function TaskDetailModal({ task, onClose, onToggle, onEdit, onDel
               </div>
             )}
 
-          {/* ═══ HISTORY TAB ═══ */}
+                    {/* ═══ HISTORY TAB ═══ */}
           {activeTab === 'history' && (
             <div className="task-history">
-                            {allHistory.length === 0 ? (
+              {allHistory.length === 0 ? (
                 <div className="remarks-empty">
                   <i className="fas fa-history"></i>
                   <p>No history yet</p>
@@ -249,59 +272,108 @@ export default function TaskDetailModal({ task, onClose, onToggle, onEdit, onDel
                 </div>
               ) : (
                 <>
-                  <div className="history-list">
-                    {history.map(entry => (
-                      <div key={entry.id} className="history-item">
-                        <div className="history-icon">
-                          <i className={`fas ${
-                            entry.action === 'created' ? 'fa-plus-circle' :
-                            entry.action === 'completed' ? 'fa-check-circle' :
-                            entry.action === 'reopened' ? 'fa-undo' :
-                            entry.action === 'updated' ? 'fa-edit' :
-                            entry.action === 'remark_added' ? 'fa-comment' :
-                            'fa-circle'
-                          }`}></i>
-                        </div>
-                        <div className="history-content">
-                          <div className="history-action">
-                            <strong>{escapeHtml(entry.user || 'system')}</strong>{' '}
-                            {entry.action === 'created' && 'created this task'}
-                            {entry.action === 'completed' && 'marked it as complete'}
-                            {entry.action === 'reopened' && 'reopened the task'}
-                            {entry.action === 'updated' && 'updated'}
-                            {entry.action === 'remark_added' && 'added a remark'}
-                          </div>
-                          {entry.changes && (
-                            <div className="history-changes">
-                              {Object.entries(entry.changes).map(([field, { from, to }]) => (
-                                <div key={field} className="history-change">
-                                  <span className="change-field">{field}:</span>
-                                  <span className="change-from">{String(from || '—')}</span>
-                                  <i className="fas fa-arrow-right"></i>
-                                  <span className="change-to">{String(to || '—')}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          <div className="history-time">{formatDateTime(entry.timestamp)}</div>
-                        </div>
-                      </div>
+                  {/* Statistics header */}
+                  <div className="history-stats">
+                    <div className="history-stat">
+                      <i className="fas fa-history"></i>
+                      <span><strong>{allHistory.length}</strong> total changes</span>
+                    </div>
+                    <div className="history-stat">
+                      <i className="fas fa-users"></i>
+                      <span>by <strong>{uniqueUsers}</strong> user{uniqueUsers !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
+
+                  {/* Filter chips */}
+                  <div className="history-filters">
+                    {[
+                      { id: 'all', label: 'All', icon: 'fa-layer-group' },
+                      { id: 'updates', label: 'Updates', icon: 'fa-edit' },
+                      { id: 'remarks', label: 'Remarks', icon: 'fa-comment' },
+                      { id: 'status', label: 'Status', icon: 'fa-check-circle' },
+                      { id: 'assignees', label: 'Assignees', icon: 'fa-users' },
+                    ].map(f => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        className={`history-filter-chip ${historyFilter === f.id ? 'active' : ''}`}
+                        onClick={() => { setHistoryFilter(f.id); setVisibleHistory(20); }}
+                      >
+                        <i className={`fas ${f.icon}`}></i>
+                        <span>{f.label}</span>
+                      </button>
                     ))}
                   </div>
-                  {hasMoreHistory && (
-                    <button
-                      type="button"
-                      className="load-more-btn"
-                      onClick={() => setVisibleHistory(v => v + 20)}
-                    >
-                      <i className="fas fa-chevron-down"></i>
-                      Load more history ({allHistory.length - visibleHistory} remaining)
-                    </button>
-                  )}
-                  {allHistory.length > 20 && (
-                    <div className="items-shown-footer">
-                      Showing {Math.min(visibleHistory, allHistory.length)} of {allHistory.length}
+
+                  {/* History list */}
+                  {filteredHistory.length === 0 ? (
+                    <div className="remarks-empty">
+                      <i className="fas fa-filter"></i>
+                      <p>No entries match this filter</p>
+                      <span>Try a different filter</span>
                     </div>
+                  ) : (
+                    <>
+                      <div className="history-list">
+                        {history.map(entry => {
+                          const actionMap = {
+                            created: { icon: 'fa-plus-circle', class: 'created', text: 'created this task' },
+                            updated: { icon: 'fa-edit', class: 'updated', text: 'updated' },
+                            completed: { icon: 'fa-check-circle', class: 'completed', text: 'marked it as complete' },
+                            reopened: { icon: 'fa-undo', class: 'reopened', text: 'reopened the task' },
+                            remark_added: { icon: 'fa-comment', class: 'remark', text: 'added a remark' },
+                            assignee_added: { icon: 'fa-user-plus', class: 'assignee-add', text: 'added an assignee' },
+                            assignee_removed: { icon: 'fa-user-minus', class: 'assignee-remove', text: 'removed an assignee' },
+                          };
+                          const meta = actionMap[entry.action] || { icon: 'fa-circle', class: 'default', text: entry.action };
+                          return (
+                            <div key={entry.id} className="history-item">
+                              <div className={`history-icon ${meta.class}`}>
+                                <i className={`fas ${meta.icon}`}></i>
+                              </div>
+                              <div className="history-content">
+                                <div className="history-action">
+                                  <strong>{escapeHtml(entry.user || 'system')}</strong>{' '}
+                                  {meta.text}
+                                </div>
+                                {entry.changes && (
+                                  <div className="history-changes">
+                                    {Object.entries(entry.changes).map(([field, { from, to }]) => (
+                                      <div key={field} className="history-change">
+                                        <span className="change-field">{field}:</span>
+                                        <span className="change-from">
+                                          {Array.isArray(from) ? from.join(', ') || '—' : String(from || '—')}
+                                        </span>
+                                        <i className="fas fa-arrow-right"></i>
+                                        <span className="change-to">
+                                          {Array.isArray(to) ? to.join(', ') || '—' : String(to || '—')}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                <div className="history-time">{formatDateTime(entry.timestamp)}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {hasMoreHistory && (
+                        <button
+                          type="button"
+                          className="load-more-btn"
+                          onClick={() => setVisibleHistory(v => v + 20)}
+                        >
+                          <i className="fas fa-chevron-down"></i>
+                          Load more history ({filteredHistory.length - visibleHistory} remaining)
+                        </button>
+                      )}
+                      {filteredHistory.length > 20 && (
+                        <div className="items-shown-footer">
+                          Showing {Math.min(visibleHistory, filteredHistory.length)} of {filteredHistory.length}
+                        </div>
+                      )}
+                    </>
                   )}
                 </>
               )}
