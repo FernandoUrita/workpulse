@@ -4,6 +4,8 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { computeAging } from '../../utils/ticketHelpers.js';
 import TicketCard from './TicketCard.jsx';
 import TicketModal from './TicketModal.jsx';
+import ImportModal from './ImportModal.jsx';
+import { stringifyCSV, downloadCSV } from '../../utils/csvHelpers.js';
 import ConfirmModal from '../../components/common/ConfirmModal.jsx';
 import Pagination from '../../components/common/Pagination.jsx';
 
@@ -20,6 +22,7 @@ export default function TicketsPage() {
     addTicket,
     updateTicket,
     deleteTicket,
+    importTickets,
   } = useAppData();
   const { showToast } = useToast();
 
@@ -35,6 +38,7 @@ export default function TicketsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
   const [deletingTicket, setDeletingTicket] = useState(null);
+    const [showImport, setShowImport] = useState(false);
 
   // Filter by tab
   const tabTickets = useMemo(
@@ -120,6 +124,43 @@ export default function TicketsPage() {
     }
   };
 
+  const handleExport = () => {
+    if (filtered.length === 0) {
+      showToast('warning', 'Nothing to Export', 'No tickets match the current filters.');
+      return;
+    }
+
+    const headers = [
+      'Ticket No.', 'Client Name', 'Subject', 'Remarks',
+      'Status', 'Priority', 'Category', 'Pending To?',
+      'Timeline', 'Date Created', 'Date Last Update',
+    ];
+
+    const rows = filtered.map(t => ({
+      'Ticket No.': t.ticketNo || '',
+      'Client Name': t.clientName || '',
+      'Subject': t.subject || '',
+      'Remarks': t.remarks || '',
+      'Status': t.status || '',
+      'Priority': t.priority || '',
+      'Category': t.category || '',
+      'Pending To?': t.pendingTo || '',
+      'Timeline': t.timeline || '',
+      'Date Created': t.dateCreated ? new Date(t.dateCreated).toLocaleString('en-PH') : '',
+      'Date Last Update': t.dateLastUpdate ? new Date(t.dateLastUpdate).toLocaleString('en-PH') : '',
+    }));
+
+    const csv = stringifyCSV(headers, rows);
+    const today = new Date().toISOString().slice(0, 10);
+    downloadCSV(`workpulse-tickets-${today}.csv`, csv);
+    showToast('success', 'Export Complete', `${filtered.length} ticket(s) exported.`);
+  };
+
+  const handleImport = (newTickets) => {
+    const withType = newTickets.map(t => ({ ...t, taskType: activeTab }));
+    importTickets(withType);
+  };
+
   const clearFilters = () => {
     setSearch('');
     setStatusFilter('all');
@@ -141,6 +182,12 @@ export default function TicketsPage() {
       <div className="module-header">
         <h3><i className="fas fa-ticket-alt"></i> Ticket Monitoring</h3>
         <div className="module-actions">
+          <button className="secondary-btn" onClick={handleExport} title="Export to CSV">
+            <i className="fas fa-file-export"></i> Export
+          </button>
+          <button className="secondary-btn" onClick={() => setShowImport(true)} title="Import from CSV">
+            <i className="fas fa-file-import"></i> Import
+          </button>
           <button className="primary-btn" onClick={handleAdd}>
             <i className="fas fa-plus"></i> New Ticket
           </button>
@@ -306,6 +353,14 @@ export default function TicketsPage() {
           />
         </>
       )}
+
+      <ImportModal
+        show={showImport}
+        taskType={activeTab}
+        existingTickets={tickets || []}
+        onClose={() => setShowImport(false)}
+        onImport={handleImport}
+      />
 
       <TicketModal
         show={showModal}
