@@ -286,15 +286,17 @@ export default function TicketsPage() {
         </div>
       ) : (
         <>
-          {paginated.map(ticket => (
-            <TicketCard
-              key={ticket.id}
-              ticket={ticket}
-              onView={handleEdit}
-              onEdit={handleEdit}
-              onDelete={setDeletingTicket}
-            />
-          ))}
+          <div className="ticket-list">
+            {paginated.map(ticket => (
+              <TicketCard
+                key={ticket.id}
+                ticket={ticket}
+                onView={handleEdit}
+                onEdit={handleEdit}
+                onDelete={setDeletingTicket}
+              />
+            ))}
+          </div>
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

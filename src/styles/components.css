@@ -5219,3 +5219,16 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── TICKET LIST (1 card per ticket) ─── */
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.ticket-list .ticket-card {
+  width: 100%;
+  margin-bottom: 0;
+}
