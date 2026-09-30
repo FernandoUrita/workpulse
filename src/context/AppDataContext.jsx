@@ -566,6 +566,48 @@ export function AppDataProvider({ children }) {
     return newTickets;
   }, [data, saveData, currentUser]);
 
+  
+    const addTicketRemark = useCallback((ticketId, text) => {
+    if (!text || !text.trim()) return;
+    const newTickets = (data.tickets || []).map(t => {
+      if (t.id !== ticketId) return t;
+      const remark = {
+        id: Date.now() + Math.random(),
+        text: text.trim(),
+        author: currentUser?.username || 'unknown',
+        authorName: currentUser?.name || 'Unknown',
+        timestamp: Date.now(),
+      };
+      return {
+        ...t,
+        updatedAt: Date.now(),
+        comments: [...(t.comments || []), remark],   // ← PALITAN: comments
+        auditLog: [
+          ...(t.auditLog || []),
+          {
+            id: Date.now() + Math.random(),
+            action: 'remark_added',
+            user: currentUser?.username || 'system',
+            timestamp: Date.now(),
+          },
+        ],
+      };
+    });
+    saveData({ ...data, tickets: newTickets });
+  }, [data, saveData, currentUser]);
+
+  const deleteTicketRemark = useCallback((ticketId, remarkId) => {
+    const newTickets = (data.tickets || []).map(t => {
+      if (t.id !== ticketId) return t;
+      return {
+        ...t,
+        updatedAt: Date.now(),
+        comments: (t.comments || []).filter(r => r.id !== remarkId),   // ← PALITAN: comments
+      };
+    });
+    saveData({ ...data, tickets: newTickets });
+  }, [data, saveData]);
+
   // ─── MOM TEMPLATE ──────────────────────────────
   const updateMomTemplate = useCallback((template) => {
     saveData({ ...data, momTemplate: template });
@@ -626,6 +668,8 @@ export function AppDataProvider({ children }) {
       deleteTicket,
       bulkDeleteTickets,
       importTickets,
+      addTicketRemark,
+      deleteTicketRemark,
       // MOM
       updateMomTemplate,
       resetMomTemplate,

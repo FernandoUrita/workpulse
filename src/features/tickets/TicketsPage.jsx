@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { computeAging } from '../../utils/ticketHelpers.js';
 import TicketCard from './TicketCard.jsx';
 import TicketModal from './TicketModal.jsx';
 import ImportModal from './ImportModal.jsx';
+import TicketDetailModal from './TicketDetailModal.jsx';
 import { stringifyCSV, downloadCSV } from '../../utils/csvHelpers.js';
 import ConfirmModal from '../../components/common/ConfirmModal.jsx';
 import Pagination from '../../components/common/Pagination.jsx';
@@ -38,7 +39,18 @@ export default function TicketsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
   const [deletingTicket, setDeletingTicket] = useState(null);
-    const [showImport, setShowImport] = useState(false);
+  const [detailTicket, setDetailTicket] = useState(null);
+  const [showImport, setShowImport] = useState(false);
+
+  
+  // ─── SYNC DETAIL TICKET WITH LATEST DATA ───
+  useEffect(() => {
+    if (!detailTicket) return;
+    const updated = tickets.find(t => t.id === detailTicket.id);
+    if (updated && updated !== detailTicket) {
+      setDetailTicket(updated);
+    }
+  }, [tickets, detailTicket]);
 
   // Filter by tab
   const tabTickets = useMemo(
@@ -338,7 +350,7 @@ export default function TicketsPage() {
               <TicketCard
                 key={ticket.id}
                 ticket={ticket}
-                onView={handleEdit}
+                onView={setDetailTicket}
                 onEdit={handleEdit}
                 onDelete={setDeletingTicket}
               />
@@ -361,6 +373,15 @@ export default function TicketsPage() {
         onClose={() => setShowImport(false)}
         onImport={handleImport}
       />
+
+      {detailTicket && (
+        <TicketDetailModal
+          ticket={detailTicket}
+          onClose={() => setDetailTicket(null)}
+          onEdit={(t) => { setDetailTicket(null); handleEdit(t); }}
+          onDelete={(t) => { setDetailTicket(null); setDeletingTicket(t); }}
+        />
+      )}
 
       <TicketModal
         show={showModal}
