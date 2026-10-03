@@ -6,6 +6,7 @@ import TicketCard from './TicketCard.jsx';
 import TicketModal from './TicketModal.jsx';
 import ImportModal from './ImportModal.jsx';
 import TicketDetailModal from './TicketDetailModal.jsx';
+import TicketKanbanBoard from './TicketKanbanBoard.jsx';
 import { stringifyCSV, downloadCSV } from '../../utils/csvHelpers.js';
 import ConfirmModal from '../../components/common/ConfirmModal.jsx';
 import Pagination from '../../components/common/Pagination.jsx';
@@ -41,6 +42,7 @@ export default function TicketsPage() {
   const [deletingTicket, setDeletingTicket] = useState(null);
   const [detailTicket, setDetailTicket] = useState(null);
   const [showImport, setShowImport] = useState(false);
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'kanban'
 
   
   // ─── SYNC DETAIL TICKET WITH LATEST DATA ───
@@ -193,10 +195,28 @@ export default function TicketsPage() {
     <section className="module">
       <div className="module-header">
         <h3><i className="fas fa-ticket-alt"></i> Ticket Monitoring</h3>
-        <div className="module-actions">
-          <button className="secondary-btn" onClick={handleExport} title="Export to CSV">
-            <i className="fas fa-file-export"></i> Export
-          </button>
+          <div className="module-actions">
+            <div className="view-toggle">
+              <button
+                type="button"
+                className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                onClick={() => setViewMode('list')}
+                title="List view"
+              >
+                <i className="fas fa-list"></i>
+              </button>
+              <button
+                type="button"
+                className={`view-toggle-btn ${viewMode === 'kanban' ? 'active' : ''}`}
+                onClick={() => setViewMode('kanban')}
+                title="Kanban view"
+              >
+                <i className="fas fa-columns"></i>
+              </button>
+            </div>
+            <button className="secondary-btn" onClick={handleExport} title="Export to CSV">
+              <i className="fas fa-file-export"></i> Export
+            </button>
           <button className="secondary-btn" onClick={() => setShowImport(true)} title="Import from CSV">
             <i className="fas fa-file-import"></i> Import
           </button>
@@ -319,7 +339,9 @@ export default function TicketsPage() {
       </div>
 
       {/* ─── TICKET LIST ─── */}
-      {paginated.length === 0 ? (
+      {viewMode === 'kanban' ? (
+        <TicketKanbanBoard tickets={filtered} onView={setDetailTicket} />
+      ) : paginated.length === 0 ? (
         <div className="empty-state-enhanced">
           <div className="empty-illustration items">
             <i className="fas fa-ticket-alt"></i>

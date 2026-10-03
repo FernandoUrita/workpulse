@@ -608,6 +608,32 @@ export function AppDataProvider({ children }) {
     saveData({ ...data, tickets: newTickets });
   }, [data, saveData]);
 
+  const moveTicketToColumn = useCallback((ticketId, newStatus) => {
+    const newTickets = (data.tickets || []).map(t => {
+      if (t.id !== ticketId) return t;
+      const oldStatus = t.status || 'Open';
+      if (oldStatus === newStatus) return t;
+
+      const auditEntry = {
+        id: Date.now() + Math.random(),
+        action: 'updated',
+        user: currentUser?.username || 'system',
+        timestamp: Date.now(),
+        changes: {
+          status: { from: oldStatus, to: newStatus },
+        },
+      };
+
+      return {
+        ...t,
+        status: newStatus,
+        updatedAt: Date.now(),
+        auditLog: [...(t.auditLog || []), auditEntry],
+      };
+    });
+    saveData({ ...data, tickets: newTickets });
+  }, [data, saveData, currentUser]);
+
   // ─── MOM TEMPLATE ──────────────────────────────
   const updateMomTemplate = useCallback((template) => {
     saveData({ ...data, momTemplate: template });
@@ -670,6 +696,7 @@ export function AppDataProvider({ children }) {
       importTickets,
       addTicketRemark,
       deleteTicketRemark,
+      moveTicketToColumn,
       // MOM
       updateMomTemplate,
       resetMomTemplate,

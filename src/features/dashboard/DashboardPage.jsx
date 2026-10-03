@@ -1,11 +1,25 @@
+import { useMemo } from 'react';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { Link } from 'react-router-dom';
 import { escapeHtml } from '../../utils/helpers.js';
 
 export default function DashboardPage() {
-  const { tasks, meetings, items } = useAppData();
+  const { tasks, meetings, items, tickets } = useAppData();
 
   const completed = tasks.filter(t => t.done).length;
+
+  // Ticket stats
+  const ticketStats = useMemo(() => {
+    const all = tickets || [];
+    return {
+      total: all.length,
+      open: all.filter(t => t.status === 'Open').length,
+      inProgress: all.filter(t => t.status === 'In Progress').length,
+      hypercare: all.filter(t => t.status === 'Hypercare').length,
+      closed: all.filter(t => t.status === 'Closed').length,
+    };
+  }, [tickets]);
+
   const totalTasks = tasks.length;
   const pending = totalTasks - completed;
   const percentage = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
@@ -100,6 +114,36 @@ export default function DashboardPage() {
             <p>Completed Tasks</p>
           </div>
         </div>
+
+        {/* ─── TICKET STATS ─── */}
+        <Link to="/tickets" className="stat-card stat-card-link">
+          <div className="stat-icon blue"><i className="fas fa-ticket-alt"></i></div>
+          <div className="stat-info">
+            <h3>{ticketStats.total}</h3>
+            <p>Total Tickets</p>
+          </div>
+        </Link>
+        <Link to="/tickets" className="stat-card stat-card-link">
+          <div className="stat-icon green"><i className="fas fa-folder-open"></i></div>
+          <div className="stat-info">
+            <h3>{ticketStats.open}</h3>
+            <p>Open Tickets</p>
+          </div>
+        </Link>
+        <Link to="/tickets" className="stat-card stat-card-link">
+          <div className="stat-icon purple"><i className="fas fa-spinner"></i></div>
+          <div className="stat-info">
+            <h3>{ticketStats.inProgress}</h3>
+            <p>In Progress</p>
+          </div>
+        </Link>
+        <Link to="/tickets" className="stat-card stat-card-link">
+          <div className="stat-icon orange"><i className="fas fa-fire"></i></div>
+          <div className="stat-info">
+            <h3>{ticketStats.hypercare}</h3>
+            <p>Hypercare</p>
+          </div>
+        </Link>
       </div>
 
       {/* ─── CHARTS ROW ──────────────────────── */}

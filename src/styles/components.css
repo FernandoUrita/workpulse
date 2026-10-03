@@ -5593,3 +5593,49 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── TICKET KANBAN ─── */
+.ticket-kanban-card {
+  padding: 10px 12px;
+}
+
+.ticket-kanban-no {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+}
+
+.ticket-kanban-no > i {
+  font-size: 10px;
+}
+
+.ticket-kanban-client {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.ticket-kanban-client > i {
+  color: var(--primary);
+  font-size: 10px;
+}
+
+/* ─── CLICKABLE STAT CARDS ─── */
+.stat-card-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.stat-card-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.12);
+  border-color: var(--primary);
+}
