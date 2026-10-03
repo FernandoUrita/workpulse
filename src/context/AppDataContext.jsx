@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { useTasks } from '../hooks/useTasks.js';
 import { useTickets } from '../hooks/useTickets.js';
 import { useMeetings } from '../hooks/useMeetings.js';
+import { useItems } from '../hooks/useItems.js';
 
 const AppDataContext = createContext(null);
 
@@ -148,6 +149,7 @@ export function AppDataProvider({ children }) {
   const tasksHook = useTasks();
   const ticketsHook = useTickets();
   const meetingsHook = useMeetings();
+  const itemsHook = useItems();
   const [data, setData] = useState({
     tasks: [],
     meetings: [],
@@ -665,10 +667,9 @@ export function AppDataProvider({ children }) {
     <AppDataContext.Provider value={{
       // Data — tasks from Supabase hook
       tasks: tasksHook.tasks,
-      items: data.items,
       tickets: data.tickets || [],
       momTemplate: data.momTemplate,
-      loading: loading || tasksHook.loading || ticketsHook.loading || meetingsHook.loading,
+      loading: loading || tasksHook.loading || ticketsHook.loading || meetingsHook.loading || itemsHook.loading,
       defaultMomTemplate: DEFAULT_MOM_TEMPLATE,
       // Tasks (from Supabase hook)
       addTask: tasksHook.addTask,
@@ -698,11 +699,12 @@ export function AppDataProvider({ children }) {
       updateMeeting: meetingsHook.updateMeeting,
       deleteMeeting: meetingsHook.deleteMeeting,
       completeMeeting: meetingsHook.completeMeeting,
-      // Items
-      addItem,
-      updateItem,
-      deleteItem,
-      addCheckin,
+      // Items (from Supabase hook)
+      items: itemsHook.items,
+      addItem: itemsHook.addItem,
+      updateItem: itemsHook.updateItem,
+      deleteItem: itemsHook.deleteItem,
+      addCheckin: itemsHook.addCheckin,
       // MOM
       updateMomTemplate,
       resetMomTemplate,
