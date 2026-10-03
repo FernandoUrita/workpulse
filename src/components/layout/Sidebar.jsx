@@ -4,14 +4,18 @@ import ThemeToggle from '../common/ThemeToggle.jsx';
 import { useAppData } from '../../context/AppDataContext.jsx';
 
 const NAV_ITEMS = [
-  { path: '/dashboard', label: 'Dashboard', icon: 'fa-th-large' },
-  { path: '/tasks', label: 'Tasks', icon: 'fa-tasks', badgeKey: 'tasks' },
-  { path: '/meetings', label: 'Meetings', icon: 'fa-calendar-alt', badgeKey: 'meetings' },
-  { path: '/items', label: 'Items', icon: 'fa-box', badgeKey: 'items' },
-  { path: '/tickets', label: 'Tickets', icon: 'fa-ticket-alt', badgeKey: 'tickets' },    // ← BAGO
-  { path: '/mom', label: 'MOM Templates', icon: 'fa-file-alt' },
-  { path: '/activity', label: 'Activity', icon: 'fa-stream' },
-  { path: '/settings', label: 'Settings', icon: 'fa-cog' },
+  { path: '/dashboard', label: 'Dashboard', icon: 'fa-th-large', roles: ['employee', 'head', 'admin'] },
+  { path: '/tasks', label: 'Tasks', icon: 'fa-tasks', badgeKey: 'tasks', roles: ['employee', 'head', 'admin'] },
+  { path: '/meetings', label: 'Meetings', icon: 'fa-calendar-alt', badgeKey: 'meetings', roles: ['employee', 'head', 'admin'] },
+  { path: '/items', label: 'Items', icon: 'fa-box', badgeKey: 'items', roles: ['employee', 'head', 'admin'] },
+  { path: '/tickets', label: 'Tickets', icon: 'fa-ticket-alt', badgeKey: 'tickets', roles: ['employee', 'head', 'admin'] },
+  { path: '/mom', label: 'MOM Templates', icon: 'fa-file-alt', roles: ['employee', 'head', 'admin'] },
+  { path: '/activity', label: 'Activity', icon: 'fa-stream', roles: ['employee', 'head', 'admin'] },
+  // Head + Admin only
+  { path: '/reports', label: 'Reports', icon: 'fa-chart-line', roles: ['head', 'admin'] },
+  // Admin only
+  { path: '/users', label: 'Users', icon: 'fa-users-cog', roles: ['admin'] },
+  { path: '/settings', label: 'Settings', icon: 'fa-cog', roles: ['employee', 'head', 'admin'] },
 ];
 
 export default function Sidebar({ isOpen, onToggle }) {
@@ -53,7 +57,7 @@ export default function Sidebar({ isOpen, onToggle }) {
 
       <nav className="sidebar-nav">
         <ul>
-          {NAV_ITEMS.map(item => (
+          {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(currentUser?.role)).map(item => (
             <li key={item.path} className="nav-item">
               <NavLink
                 to={item.path}
@@ -72,7 +76,14 @@ export default function Sidebar({ isOpen, onToggle }) {
       </nav>
 
       <div className="sidebar-footer">
-        <div className="version">v2.0.0</div>
+        <div className="version">
+          v2.0.0
+          {currentUser?.role && (
+            <span className={`role-badge role-${currentUser.role}`}>
+              {currentUser.role}
+            </span>
+          )}
+        </div>
         <ThemeToggle className="theme-toggle-sidebar" />
       </div>
     </aside>
