@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { useAuth } from './AuthContext';
 import { useTasks } from '../hooks/useTasks.js';
 import { useTickets } from '../hooks/useTickets.js';
+import { useMeetings } from '../hooks/useMeetings.js';
 
 const AppDataContext = createContext(null);
 
@@ -146,6 +147,7 @@ export function AppDataProvider({ children }) {
   // ─── SUPABASE HOOKS ────────────────────────────
   const tasksHook = useTasks();
   const ticketsHook = useTickets();
+  const meetingsHook = useMeetings();
   const [data, setData] = useState({
     tasks: [],
     meetings: [],
@@ -663,11 +665,10 @@ export function AppDataProvider({ children }) {
     <AppDataContext.Provider value={{
       // Data — tasks from Supabase hook
       tasks: tasksHook.tasks,
-      meetings: data.meetings,
       items: data.items,
       tickets: data.tickets || [],
       momTemplate: data.momTemplate,
-      loading: loading || tasksHook.loading || ticketsHook.loading,
+      loading: loading || tasksHook.loading || ticketsHook.loading || meetingsHook.loading,
       defaultMomTemplate: DEFAULT_MOM_TEMPLATE,
       // Tasks (from Supabase hook)
       addTask: tasksHook.addTask,
@@ -691,11 +692,12 @@ export function AppDataProvider({ children }) {
       addTicketRemark: ticketsHook.addTicketRemark,
       deleteTicketRemark: ticketsHook.deleteTicketRemark,
       moveTicketToColumn: ticketsHook.moveTicketToColumn,
-      // Meetings
-      addMeeting,
-      updateMeeting,
-      deleteMeeting,
-      completeMeeting,
+      // Meetings (from Supabase hook)
+      meetings: meetingsHook.meetings,
+      addMeeting: meetingsHook.addMeeting,
+      updateMeeting: meetingsHook.updateMeeting,
+      deleteMeeting: meetingsHook.deleteMeeting,
+      completeMeeting: meetingsHook.completeMeeting,
       // Items
       addItem,
       updateItem,

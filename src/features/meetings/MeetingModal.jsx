@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { MEETING_PLATFORMS } from '../../utils/constants.js';
 
@@ -17,6 +18,7 @@ const EMPTY = {
 };
 
 export default function MeetingModal({ show, meeting, onClose, onSave }) {
+  const { currentUser } = useAuth();
   const [form, setForm] = useState(EMPTY);
   const [attendees, setAttendees] = useState([]);
   const [agenda, setAgenda] = useState([]);
@@ -44,13 +46,14 @@ export default function MeetingModal({ show, meeting, onClose, onSave }) {
         setAgenda(meeting.agenda || []);
       } else {
         setForm(EMPTY);
-        setAttendees([]);
+        // Auto-fill current user as first attendee
+        setAttendees(currentUser?.username ? [currentUser.username] : []);
         setAgenda([]);
       }
       setAttendeeInput('');
       setAgendaInput('');
     }
-  }, [show, meeting]);
+  }, [show, meeting, currentUser]);
 
   if (!show) return null;
 
