@@ -5,7 +5,9 @@ import { useAuth } from './context/AuthContext.jsx';
 import AppLayout from './components/layout/AppLayout.jsx';
 import LoginPage from './components/auth/LoginPage.jsx';
 import RegisterPage from './components/auth/RegisterPage.jsx';
+import RoleGuard from './components/auth/RoleGuard.jsx';
 
+const ReportsPage = lazy(() => import('./features/reports/ReportsPage.jsx'));
 const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage.jsx'));
 const TasksPage = lazy(() => import('./features/tasks/TasksPage.jsx'));
 const MeetingsPage = lazy(() => import('./features/meetings/MeetingsPage.jsx'));
@@ -102,6 +104,11 @@ export default function App() {
           <Route path="/tickets" element={<TicketsPage />} />
           <Route path="/mom" element={<MomTemplatesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/reports" element={
+            <RoleGuard allowedRoles={['head', 'admin']}>
+              <ReportsPage />
+            </RoleGuard>
+          } />
           <Route path="/activity" element={<ActivityPage />} />
         </Route>
 
