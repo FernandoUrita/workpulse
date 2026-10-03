@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { useTasks } from '../hooks/useTasks.js';
+import { useTickets } from '../hooks/useTickets.js';
 
 const AppDataContext = createContext(null);
 
@@ -144,6 +145,7 @@ export function AppDataProvider({ children }) {
   const { currentUser } = useAuth();
   // ─── SUPABASE HOOKS ────────────────────────────
   const tasksHook = useTasks();
+  const ticketsHook = useTickets();
   const [data, setData] = useState({
     tasks: [],
     meetings: [],
@@ -665,7 +667,7 @@ export function AppDataProvider({ children }) {
       items: data.items,
       tickets: data.tickets || [],
       momTemplate: data.momTemplate,
-      loading: loading || tasksHook.loading,
+      loading: loading || tasksHook.loading || ticketsHook.loading,
       defaultMomTemplate: DEFAULT_MOM_TEMPLATE,
       // Tasks (from Supabase hook)
       addTask: tasksHook.addTask,
@@ -679,15 +681,16 @@ export function AppDataProvider({ children }) {
       deleteRemark: tasksHook.deleteRemark,
       addAssignee: tasksHook.addAssignee,
       removeAssignee: tasksHook.removeAssignee,
-      // Tickets
-      addTicket,
-      updateTicket,
-      deleteTicket,
-      bulkDeleteTickets,
-      importTickets,
-      addTicketRemark,
-      deleteTicketRemark,
-      moveTicketToColumn,
+      // Tickets (from Supabase hook)
+      tickets: ticketsHook.tickets,
+      addTicket: ticketsHook.addTicket,
+      updateTicket: ticketsHook.updateTicket,
+      deleteTicket: ticketsHook.deleteTicket,
+      bulkDeleteTickets: ticketsHook.bulkDeleteTickets,
+      importTickets: ticketsHook.importTickets,
+      addTicketRemark: ticketsHook.addTicketRemark,
+      deleteTicketRemark: ticketsHook.deleteTicketRemark,
+      moveTicketToColumn: ticketsHook.moveTicketToColumn,
       // Meetings
       addMeeting,
       updateMeeting,
