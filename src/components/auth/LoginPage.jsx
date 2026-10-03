@@ -4,24 +4,29 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       showToast('warning', 'Missing Fields', 'Please fill in all fields.');
       return;
     }
-    const result = login(username.trim(), password.trim());
+
+    setSubmitting(true);
+    const result = await login(email.trim().toLowerCase(), password);
+    setSubmitting(false);
+
     if (result.success) {
-      showToast('success', 'Welcome Back!', `Hello, ${username}!`);
+      showToast('success', 'Welcome Back!', 'Signed in successfully.');
       navigate('/dashboard');
     } else {
-      showToast('error', 'Login Failed', result.error);
+      showToast('error', 'Login Failed', result.error || 'Invalid email or password.');
     }
   };
 
@@ -39,15 +44,17 @@ export default function LoginPage() {
 
           <form className="auth-form active" onSubmit={handleSubmit}>
             <h3><i className="fas fa-sign-in-alt"></i> Welcome Back</h3>
-            
+
             <div className="form-group">
-              <label><i className="fas fa-user"></i> Username</label>
+              <label><i className="fas fa-envelope"></i> Email</label>
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                autoComplete="email"
                 autoFocus
+                disabled={submitting}
               />
             </div>
 
@@ -57,12 +64,18 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                disabled={submitting}
               />
             </div>
 
-            <button type="submit" className="primary-btn full-width">
-              <i className="fas fa-sign-in-alt"></i> Login
+            <button type="submit" className="primary-btn full-width" disabled={submitting}>
+              {submitting ? (
+                <><i className="fas fa-spinner fa-spin"></i> Signing in...</>
+              ) : (
+                <><i className="fas fa-sign-in-alt"></i> Login</>
+              )}
             </button>
 
             <p className="auth-switch">

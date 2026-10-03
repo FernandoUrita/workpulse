@@ -11,6 +11,7 @@ export default function RegisterPage() {
     password: '',
     confirm: '',
   });
+  const [submitting, setSubmitting] = useState(false);
   const { register } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function RegisterPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, username, email, password, confirm } = formData;
 
@@ -36,12 +37,24 @@ export default function RegisterPage() {
       return;
     }
 
-    const result = register(name, username, email, password);
+    setSubmitting(true);
+    const result = await register(
+      name.trim(),
+      username.trim().toLowerCase(),
+      email.trim().toLowerCase(),
+      password
+    );
+    setSubmitting(false);
+
     if (result.success) {
-      showToast('success', 'Account Created!', 'Please login with your credentials.');
+      showToast(
+        'success',
+        'Account Created!',
+        'Please check your email to verify, then login.'
+      );
       navigate('/login');
     } else {
-      showToast('error', 'Registration Failed', result.error);
+      showToast('error', 'Registration Failed', result.error || 'Something went wrong.');
     }
   };
 
@@ -68,7 +81,9 @@ export default function RegisterPage() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Enter full name"
+                autoComplete="name"
                 autoFocus
+                disabled={submitting}
               />
             </div>
 
@@ -80,6 +95,8 @@ export default function RegisterPage() {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Choose username"
+                autoComplete="username"
+                disabled={submitting}
               />
             </div>
 
@@ -91,6 +108,8 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter email"
+                autoComplete="email"
+                disabled={submitting}
               />
             </div>
 
@@ -102,6 +121,8 @@ export default function RegisterPage() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Create password (min 6 chars)"
+                autoComplete="new-password"
+                disabled={submitting}
               />
             </div>
 
@@ -113,11 +134,17 @@ export default function RegisterPage() {
                 value={formData.confirm}
                 onChange={handleChange}
                 placeholder="Confirm password"
+                autoComplete="new-password"
+                disabled={submitting}
               />
             </div>
 
-            <button type="submit" className="primary-btn full-width">
-              <i className="fas fa-user-plus"></i> Register
+            <button type="submit" className="primary-btn full-width" disabled={submitting}>
+              {submitting ? (
+                <><i className="fas fa-spinner fa-spin"></i> Creating account...</>
+              ) : (
+                <><i className="fas fa-user-plus"></i> Register</>
+              )}
             </button>
 
             <p className="auth-switch">

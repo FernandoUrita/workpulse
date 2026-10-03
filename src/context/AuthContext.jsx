@@ -1,77 +1,151 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase.js';
 
 const AuthContext = createContext(null);
-
-const USERS_KEY = 'workpulse_users';
-const CURRENT_USER_KEY = 'workpulse_current_user';
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState([]);
 
+  // ─── FETCH PROFILE ──────────────────────────────
+  const fetchProfile = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        setCurrentUser(null);
+      } else {
+        setCurrentUser({
+          id: data.id,
+          username: data.username,
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          avatar_url: data.avatar_url,
+        });
+      }
+    } catch (err) {
+      console.error('fetchProfile error:', err);
+      setCurrentUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ─── INITIAL SESSION ────────────────────────────
   useEffect(() => {
-    const savedUsers = localStorage.getItem(USERS_KEY);
-    let loadedUsers = [];
-    if (savedUsers) {
-      try { loadedUsers = JSON.parse(savedUsers); } catch (e) { loadedUsers = []; }
-    }
-    if (loadedUsers.length === 0) {
-      loadedUsers = [{
-        name: 'Admin',
-        username: 'admin',
-        email: 'admin@workpulse.com',
-        password: 'admin123'
-      }];
-      localStorage.setItem(USERS_KEY, JSON.stringify(loadedUsers));
-    }
-    setUsers(loadedUsers);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
+      }
+    });
 
-    const savedCurrent = localStorage.getItem(CURRENT_USER_KEY);
-    if (savedCurrent) {
-      try { setCurrentUser(JSON.parse(savedCurrent)); } catch (e) {}
-    }
-    setLoading(false);
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          fetchProfile(session.user.id);
+        } else {
+          setCurrentUser(null);
+          setLoading(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = (username, password) => {
-    const user = users.find(u => u.username === username && u.password === password);
-    if (user) {
-      setCurrentUser(user);
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+  // ─── LOGIN ──────────────────────────────────────
+  const login = async (email, password) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
       return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
-    return { success: false, error: 'Invalid username or password' };
   };
 
-  const register = (name, username, email, password) => {
-    if (users.find(u => u.username === username)) {
-      return { success: false, error: 'Username already exists' };
+  // ─── REGISTER ───────────────────────────────────
+  const register = async (name, username, email, password) => {
+    try {
+      // Check if username exists
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', username)
+        .maybeSingle();
+
+      if (existing) {
+        return { success: false, error: 'Username already exists' };
+      }
+
+      // Sign up with Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+            name,
+            role: 'employee', // default role
+          },
+        },
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true, user: data.user };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
-    if (users.find(u => u.email === email)) {
-      return { success: false, error: 'Email already registered' };
-    }
-    const newUser = { name, username, email, password };
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers));
-    return { success: true };
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem(CURRENT_USER_KEY);
+  // ─── LOGOUT ─────────────────────────────────────
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setCurrentUser(null);
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
   };
 
-  const updateProfile = (name, email) => {
-    const updatedUsers = users.map(u => 
-      u.username === currentUser.username ? { ...u, name, email } : u
-    );
-    const updatedCurrent = { ...currentUser, name, email };
-    setUsers(updatedUsers);
-    setCurrentUser(updatedCurrent);
-    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers));
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedCurrent));
+  // ─── UPDATE PROFILE ─────────────────────────────
+  const updateProfile = async (name, email) => {
+    if (!currentUser) return { success: false, error: 'Not authenticated' };
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ name, email, updated_at: new Date().toISOString() })
+        .eq('id', currentUser.id);
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      setCurrentUser(prev => ({ ...prev, name, email }));
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   };
 
   return (
@@ -83,6 +157,9 @@ export function AuthProvider({ children }) {
       logout,
       updateProfile,
       isAuthenticated: !!currentUser,
+      isAdmin: currentUser?.role === 'admin',
+      isHead: currentUser?.role === 'head',
+      isEmployee: currentUser?.role === 'employee',
     }}>
       {children}
     </AuthContext.Provider>
