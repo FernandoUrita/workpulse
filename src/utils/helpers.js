@@ -52,7 +52,11 @@ export function formatDateTime(timestamp) {
 }
 
 export function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export function getWeekRange() {
@@ -85,8 +89,10 @@ export function getDateFilteredTasks(tasks, mode, activeDate) {
     
     return tasks.filter(t => {
       if (!t.dueDate) return false;
-      const due = new Date(t.dueDate + 'T00:00:00');
-      return due >= monday && due <= sunday;
+      // Normalize both to YYYY-MM-DD
+      const taskDate = String(t.dueDate).slice(0, 10);
+      const targetDate = String(activeDate).slice(0, 10);
+      return taskDate === targetDate;
     });
   }
 

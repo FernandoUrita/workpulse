@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { useTasks } from '../hooks/useTasks.js';
 
 const AppDataContext = createContext(null);
 
@@ -141,6 +142,8 @@ function computeChanges(oldTask, updates) {
 
 export function AppDataProvider({ children }) {
   const { currentUser } = useAuth();
+  // ─── SUPABASE HOOKS ────────────────────────────
+  const tasksHook = useTasks();
   const [data, setData] = useState({
     tasks: [],
     meetings: [],
@@ -656,27 +659,35 @@ export function AppDataProvider({ children }) {
 
   return (
     <AppDataContext.Provider value={{
-      // Data
-      tasks: data.tasks,
+      // Data — tasks from Supabase hook
+      tasks: tasksHook.tasks,
       meetings: data.meetings,
       items: data.items,
+      tickets: data.tickets || [],
       momTemplate: data.momTemplate,
-      loading,
+      loading: loading || tasksHook.loading,
       defaultMomTemplate: DEFAULT_MOM_TEMPLATE,
-      // Tasks
-      addTask,
-      updateTask,
-      deleteTask,
-      toggleTask,
-      moveTaskToColumn,    // ← BAGONG LINE
-      bulkDeleteTasks,
-      bulkCompleteTasks,
-      // Remarks
-      addRemark,
-      deleteRemark,
-      // Assignees
-      addAssignee,
-      removeAssignee,
+      // Tasks (from Supabase hook)
+      addTask: tasksHook.addTask,
+      updateTask: tasksHook.updateTask,
+      deleteTask: tasksHook.deleteTask,
+      toggleTask: tasksHook.toggleTask,
+      moveTaskToColumn: tasksHook.moveTaskToColumn,
+      bulkDeleteTasks: tasksHook.bulkDeleteTasks,
+      bulkCompleteTasks: tasksHook.bulkCompleteTasks,
+      addRemark: tasksHook.addRemark,
+      deleteRemark: tasksHook.deleteRemark,
+      addAssignee: tasksHook.addAssignee,
+      removeAssignee: tasksHook.removeAssignee,
+      // Tickets
+      addTicket,
+      updateTicket,
+      deleteTicket,
+      bulkDeleteTickets,
+      importTickets,
+      addTicketRemark,
+      deleteTicketRemark,
+      moveTicketToColumn,
       // Meetings
       addMeeting,
       updateMeeting,
@@ -687,16 +698,6 @@ export function AppDataProvider({ children }) {
       updateItem,
       deleteItem,
       addCheckin,
-      // Tickets
-      tickets: data.tickets || [],
-      addTicket,
-      updateTicket,
-      deleteTicket,
-      bulkDeleteTickets,
-      importTickets,
-      addTicketRemark,
-      deleteTicketRemark,
-      moveTicketToColumn,
       // MOM
       updateMomTemplate,
       resetMomTemplate,
