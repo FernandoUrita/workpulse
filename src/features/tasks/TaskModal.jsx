@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { todayISO } from '../../utils/helpers.js';
 
 const EMPTY = {
@@ -8,36 +9,67 @@ const EMPTY = {
   priority: 'medium',
   category: 'work',
   dueDate: '',
-  assignee: '',
+  assignees: [],
 };
 
 export default function TaskModal({ show, task, defaultDueDate, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY);
   const [titleError, setTitleError] = useState(false);
+  const [assigneeInput, setAssigneeInput] = useState('');
+  const { currentUser } = useAuth();
   const { showToast } = useToast();
 
   useEffect(() => {
     if (show) {
       if (task) {
+        // Edit mode: use existing assignees
         setForm({
           text: task.text || '',
           description: task.description || '',
           priority: task.priority || 'medium',
           category: task.category || 'work',
           dueDate: task.dueDate || '',
-          assignee: task.assignee || '',
+          assignees: task.assignees || [],
         });
       } else {
-        setForm({ ...EMPTY, dueDate: defaultDueDate || todayISO() });
+        // New task: auto-fill current user
+        setForm({
+          ...EMPTY,
+          dueDate: defaultDueDate || todayISO(),
+          assignees: currentUser?.username ? [currentUser.username] : [],
+        });
       }
+      setAssigneeInput('');
       setTitleError(false);
     }
-  }, [show, task, defaultDueDate]);
+  }, [show, task, defaultDueDate, currentUser]);
 
   if (!show) return null;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleAddAssignee = () => {
+    const name = assigneeInput.trim();
+    if (!name) return;
+    if (form.assignees.includes(name)) {
+      showToast('warning', 'Already Added', `"${name}" is already an assignee.`);
+      return;
+    }
+    setForm({ ...form, assignees: [...form.assignees, name] });
+    setAssigneeInput('');
+  };
+
+  const handleRemoveAssignee = (name) => {
+    setForm({ ...form, assignees: form.assignees.filter(a => a !== name) });
+  };
+
+  const handleAssigneeKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      handleAddAssignee();
+    }
   };
 
   const handleSubmit = () => {
@@ -50,7 +82,7 @@ export default function TaskModal({ show, task, defaultDueDate, onClose, onSave 
       ...form,
       text: form.text.trim(),
       description: form.description.trim(),
-      assignee: form.assignee.trim(),
+      assignees: form.assignees,
     });
     showToast(
       'success',
@@ -150,15 +182,50 @@ export default function TaskModal({ show, task, defaultDueDate, onClose, onSave 
             </div>
 
             <div className="form-group full-width">
-              <label><i className="fas fa-user"></i> Assignee</label>
-              <input
-                type="text"
-                name="assignee"
-                value={form.assignee}
-                onChange={handleChange}
-                placeholder="Who is responsible?"
-                maxLength={50}
-              />
+              <label>
+                <i className="fas fa-users"></i> Assignees
+                <span className="label-hint">(default: you)</span>
+              </label>
+
+              {/* Assignee tags */}
+              {form.assignees.length > 0 && (
+                <div className="assignee-tags">
+                  {form.assignees.map(a => (
+                    <span key={a} className="assignee-tag">
+                      <i className="fas fa-user-circle"></i>
+                      {a}
+                      <button
+                        type="button"
+                        className="assignee-remove"
+                        onClick={() => handleRemoveAssignee(a)}
+                        title="Remove"
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Add assignee input */}
+              <div className="assignee-input-row">
+                <input
+                  type="text"
+                  value={assigneeInput}
+                  onChange={(e) => setAssigneeInput(e.target.value)}
+                  onKeyDown={handleAssigneeKeyDown}
+                  placeholder="Type username and press Enter..."
+                  maxLength={50}
+                />
+                <button
+                  type="button"
+                  className="secondary-btn"
+                  onClick={handleAddAssignee}
+                  disabled={!assigneeInput.trim()}
+                >
+                  <i className="fas fa-plus"></i> Add
+                </button>
+              </div>
             </div>
           </div>
         </div>
