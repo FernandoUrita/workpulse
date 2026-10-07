@@ -262,22 +262,20 @@ export function NotificationProvider({ children }) {
     if (!currentUser) return null;
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('notifications')
         .insert({
           user_id: userId,
           sender_id: currentUser.id,
           type,
           severity,
-          title,
-          message,
+          title: title.trim(),
+          message: message.trim(),
           link,
-        })
-        .select()
-        .single();
-
+        });
+      
       if (error) throw error;
-      return data;
+      return { success: true };
     } catch (err) {
       console.error('❌ sendNotification error:', err);
       return null;
