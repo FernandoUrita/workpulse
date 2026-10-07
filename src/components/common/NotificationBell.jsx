@@ -7,6 +7,9 @@ import { formatDateTime } from '../../utils/helpers.js';
 export default function NotificationBell() {
   const {
     notifications,
+    error,
+    loading,
+    refetch,
     unreadCount,
     readIds,
     markAsRead,
@@ -40,8 +43,9 @@ export default function NotificationBell() {
     };
   }, [open]);
 
-  const handleNotificationClick = (notification) => {
-    markAsRead(notification.id);
+  const handleNotificationClick = async (notification) => {
+    const saved = await markAsRead(notification.id);
+    if (!saved) return;
     setOpen(false);
     if (notification.path) {
       navigate(notification.path);
@@ -116,11 +120,16 @@ export default function NotificationBell() {
               )}
             </div>
 
-            <div className="notif-list">
+            {error && (
+              <div role="alert" style={{ padding: '12px', color: '#b91c1c' }}>
+                {error} <button type="button" onClick={refetch}>Retry</button>
+              </div>
+            )}
+            <div className="notif-list" aria-busy={loading}>
               {notifications.length === 0 ? (
                 <div className="notif-empty">
                   <i className="fas fa-check-circle"></i>
-                  <p>You're all caught up!</p>
+                  <p>{loading ? 'Loading notifications…' : "You're all caught up!"}</p>
                   <span>No new notifications</span>
                 </div>
               ) : (

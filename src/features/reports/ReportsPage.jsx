@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAllData } from '../../hooks/useAllData.js';
 import { stringifyCSV, downloadCSV } from '../../utils/csvHelpers.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import SendNotificationModal from './SendNotificationModal.jsx';
 
 const DATE_RANGES = [
   { id: 'all', label: 'All Time' },
@@ -20,6 +21,7 @@ export default function ReportsPage() {
   const { tasks, tickets, meetings, items, profiles, loading, error } = useAllData();
   const { showToast } = useToast();
   const [dateRange, setDateRange] = useState('all');
+  const [notifyTarget, setNotifyTarget] = useState(null);
 
   const filterByRange = (list) => {
     if (dateRange === 'all') return list;
@@ -239,6 +241,7 @@ export default function ReportsPage() {
                   <th>Meetings</th>
                   <th>Items</th>
                   <th>Activity</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -281,6 +284,16 @@ export default function ReportsPage() {
                         <span className="activity-bar-label">{e.totalActivity}</span>
                       </div>
                     </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="send-reminder-btn"
+                        onClick={() => setNotifyTarget(e)}
+                        title="Send notification"
+                      >
+                        <i className="fas fa-paper-plane"></i>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -288,6 +301,12 @@ export default function ReportsPage() {
           </div>
         )}
       </div>
+      
+      <SendNotificationModal
+        show={!!notifyTarget}
+        recipient={notifyTarget}
+        onClose={() => setNotifyTarget(null)}
+      />
     </section>
   );
 }
