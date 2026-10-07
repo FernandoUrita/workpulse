@@ -259,10 +259,14 @@ export function NotificationProvider({ children }) {
 
   // ─── SEND MANUAL NOTIFICATION (Head → Employee) ─
   const sendNotification = useCallback(async ({ userId, title, message, type = 'manual', severity = 'info', link = null }) => {
+<<<<<<< HEAD
     if (!currentUser || !['head', 'admin'].includes(currentUser.role)) return null;
     if (!userId || !title?.trim() || !message?.trim() || title.length > 120 || message.length > 2000) return null;
     if (!['info', 'warning', 'critical'].includes(severity)) return null;
     if (link && (!link.startsWith('/') || link.startsWith('//'))) return null;
+=======
+    if (!currentUser) return null;
+>>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
 
     try {
       const { error } = await supabase
@@ -276,7 +280,11 @@ export function NotificationProvider({ children }) {
           message: message.trim(),
           link,
         });
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
       if (error) throw error;
       return { success: true };
     } catch (err) {

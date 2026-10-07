@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useAllData } from '../../hooks/useAllData.js';
 import { stringifyCSV, downloadCSV } from '../../utils/csvHelpers.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import SendNotificationModal from './SendNotificationModal.jsx';
 
 const DATE_RANGES = [
   { id: 'all', label: 'All Time' },
@@ -25,6 +26,7 @@ export default function ReportsPage() {
   const canSend = ['head', 'admin'].includes(currentUser?.role);
   const [recipient, setRecipient] = useState(null);
   const [dateRange, setDateRange] = useState('all');
+  const [notifyTarget, setNotifyTarget] = useState(null);
 
   const filterByRange = (list) => {
     if (dateRange === 'all') return list;
@@ -244,7 +246,11 @@ export default function ReportsPage() {
                   <th>Meetings</th>
                   <th>Items</th>
                   <th>Activity</th>
+<<<<<<< HEAD
                   {canSend && <th>Reminder</th>}
+=======
+                  <th></th>
+>>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
                 </tr>
               </thead>
               <tbody>
@@ -287,7 +293,20 @@ export default function ReportsPage() {
                         <span className="activity-bar-label">{e.totalActivity}</span>
                       </div>
                     </td>
+<<<<<<< HEAD
                     {canSend && <td><button type="button" className="btn" title="Send notification" aria-label={`Send reminder to ${e.name || e.username}`} onClick={() => setRecipient(e)}><i className="fas fa-paper-plane" aria-hidden="true"></i></button></td>}
+=======
+                    <td>
+                      <button
+                        type="button"
+                        className="send-reminder-btn"
+                        onClick={() => setNotifyTarget(e)}
+                        title="Send notification"
+                      >
+                        <i className="fas fa-paper-plane"></i>
+                      </button>
+                    </td>
+>>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
                   </tr>
                 ))}
               </tbody>
@@ -295,7 +314,16 @@ export default function ReportsPage() {
           </div>
         )}
       </div>
+<<<<<<< HEAD
     {recipient && <SendNotificationModal key={recipient.id} recipient={recipient} onClose={() => setRecipient(null)} />}
+=======
+      
+      <SendNotificationModal
+        show={!!notifyTarget}
+        recipient={notifyTarget}
+        onClose={() => setNotifyTarget(null)}
+      />
+>>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
     </section>
   );
 }

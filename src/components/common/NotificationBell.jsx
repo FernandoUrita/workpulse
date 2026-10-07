@@ -136,12 +136,15 @@ export default function NotificationBell() {
               )}
             </div>
 
+<<<<<<< HEAD
             <div style={{ padding: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {['head', 'admin'].includes(currentUser?.role) && <button type="button" className="btn" onClick={() => { setOpen(false); setCompose(true); }}>Send reminder</button>}
               <button type="button" className="btn" disabled={pushBusy} onClick={() => changePush(true)}>Enable browser push</button>
               <button type="button" className="btn" disabled={pushBusy} onClick={() => changePush(false)}>Disable push</button>
               {pushMessage && <p role="status">{pushMessage}</p>}
             </div>
+=======
+>>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
             {error && (
               <div role="alert" style={{ padding: '12px', color: '#b91c1c' }}>
                 {error} <button type="button" onClick={refetch}>Retry</button>
