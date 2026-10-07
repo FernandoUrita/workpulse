@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { disablePush } from '../pwa/push.js';
 import { supabase } from '../lib/supabase.js';
 
 const AuthContext = createContext(null);
@@ -120,6 +121,14 @@ export function AuthProvider({ children }) {
   // ─── LOGOUT ─────────────────────────────────────
   const logout = async () => {
     try {
+      if (currentUser && 'serviceWorker' in navigator) {
+        try { await disablePush(currentUser.id); }
+        catch {
+          const registration = await navigator.serviceWorker.getRegistration();
+          const subscription = await registration?.pushManager?.getSubscription();
+          await subscription?.unsubscribe();
+        }
+      }
       await supabase.auth.signOut();
       setCurrentUser(null);
     } catch (err) {

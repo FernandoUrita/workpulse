@@ -2,11 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNotifications } from '../../context/NotificationContext.jsx';
+import SendNotificationModal from './SendNotificationModal.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { enablePush, disablePush } from '../../pwa/push.js';
 import { formatDateTime } from '../../utils/helpers.js';
 
 export default function NotificationBell() {
   const {
     notifications,
+    error,
+    loading,
+    refetch,
     unreadCount,
     readIds,
     markAsRead,
@@ -14,6 +20,18 @@ export default function NotificationBell() {
     dismiss,
     dismissAll,
   } = useNotifications();
+  const { currentUser } = useAuth();
+  const [compose, setCompose] = useState(false);
+  const [pushMessage, setPushMessage] = useState('');
+  const [pushBusy, setPushBusy] = useState(false);
+  const changePush = async enabled => {
+    setPushBusy(true);
+    try {
+      await (enabled ? enablePush(currentUser.id) : disablePush(currentUser.id));
+      setPushMessage(enabled ? 'Browser push enabled on this device.' : 'Browser push disabled on this device.');
+    } catch (err) { setPushMessage(err.message); }
+    finally { setPushBusy(false); }
+  };
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const panelRef = useRef(null);
@@ -40,8 +58,9 @@ export default function NotificationBell() {
     };
   }, [open]);
 
-  const handleNotificationClick = (notification) => {
-    markAsRead(notification.id);
+  const handleNotificationClick = async (notification) => {
+    const saved = await markAsRead(notification.id);
+    if (!saved) return;
     setOpen(false);
     if (notification.path) {
       navigate(notification.path);
@@ -54,6 +73,7 @@ export default function NotificationBell() {
   };
 
   return (
+    <>
     <div className="notif-wrapper">
       <button
         ref={buttonRef}
@@ -116,11 +136,22 @@ export default function NotificationBell() {
               )}
             </div>
 
-            <div className="notif-list">
+            <div style={{ padding: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {['head', 'admin'].includes(currentUser?.role) && <button type="button" className="btn" onClick={() => { setOpen(false); setCompose(true); }}>Send reminder</button>}
+              <button type="button" className="btn" disabled={pushBusy} onClick={() => changePush(true)}>Enable browser push</button>
+              <button type="button" className="btn" disabled={pushBusy} onClick={() => changePush(false)}>Disable push</button>
+              {pushMessage && <p role="status">{pushMessage}</p>}
+            </div>
+            {error && (
+              <div role="alert" style={{ padding: '12px', color: '#b91c1c' }}>
+                {error} <button type="button" onClick={refetch}>Retry</button>
+              </div>
+            )}
+            <div className="notif-list" aria-busy={loading}>
               {notifications.length === 0 ? (
                 <div className="notif-empty">
                   <i className="fas fa-check-circle"></i>
-                  <p>You're all caught up!</p>
+                  <p>{loading ? 'Loading notifications…' : "You're all caught up!"}</p>
                   <span>No new notifications</span>
                 </div>
               ) : (
@@ -169,5 +200,7 @@ export default function NotificationBell() {
         )}
       </AnimatePresence>
     </div>
+    {compose && <SendNotificationModal onClose={() => setCompose(false)} />}
+    </>
   );
 }

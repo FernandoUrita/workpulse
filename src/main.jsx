@@ -9,6 +9,7 @@ import './styles/components.css'
 import './styles/layout.css'
 import './styles/polish.css'
 import './styles/pwa.css'
+import './styles/notification-ui.css';
 import { startPwa } from './pwa/client.js'
 
 // Context Providers

@@ -8,7 +8,7 @@ const origin = 'https://workpulse.test';
 function harness({ failInstall = false, windows = 1 } = {}) {
   const handlers = new Map();
   const stores = new Map();
-  const state = { claimed: false, skipped: false, posted: [], fetched: [] };
+  const state = { claimed: false, skipped: false, posted: [], fetched: [], notifications: [], opened: [], navigated: [], focused: 0 };
   const keyOf = request => new URL(typeof request === 'string' ? request : request.url, origin).href;
   const caches = {
     async open(name) {
@@ -28,9 +28,11 @@ function harness({ failInstall = false, windows = 1 } = {}) {
   const self = {
     location: { origin },
     addEventListener(name, callback) { handlers.set(name, callback); },
+    registration: { async showNotification(title, options) { state.notifications.push({ title, options }); } },
     clients: {
+      async openWindow(url) { state.opened.push(url); },
       async claim() { state.claimed = true; },
-      async matchAll() { return Array.from({ length: windows }, () => ({ url: origin + '/tasks' })); },
+      async matchAll() { return Array.from({ length: windows }, () => ({ url: origin + '/tasks', async navigate(url) { state.navigated.push(url); }, async focus() { state.focused++; } })); },
     },
     async skipWaiting() { state.skipped = true; },
   };
@@ -112,4 +114,27 @@ test('manifest icons have the advertised PNG dimensions and valid launch scope',
     assert.equal(data.toString('hex', 0, 8), '89504e470d0a1a0a');
     assert.equal(`${data.readUInt32BE(16)}x${data.readUInt32BE(20)}`, icon.sizes);
   }
+});
+
+
+test('push displays a stable notification tag and ignores malformed payloads', async () => {
+  const app = harness();
+  await app.fire('push', { data: { json: () => ({ id: '123', title: 'Reminder', message: 'Check task', link: '/tasks' }) } });
+  assert.equal(app.state.notifications[0].options.tag, 'workpulse-123');
+  assert.equal(app.state.notifications[0].options.body, 'Check task');
+  await app.fire('push', { data: { json: () => { throw new Error('Invalid JSON'); } } });
+  assert.equal(app.state.notifications.length, 1);
+});
+
+test('notification click navigates an existing window, opens a closed app, and blocks external URLs', async () => {
+  const app = harness();
+  const notification = link => ({ close() {}, data: { link } });
+  await app.fire('notificationclick', { notification: notification('/tasks?open=123') });
+  assert.deepEqual(app.state.navigated, [origin + '/tasks?open=123']);
+  assert.equal(app.state.focused, 1);
+  await app.fire('notificationclick', { notification: notification('https://evil.test') });
+  assert.equal(app.state.navigated.length, 1);
+  const closed = harness({ windows: 0 });
+  await closed.fire('notificationclick', { notification: notification('/dashboard') });
+  assert.deepEqual(closed.state.opened, [origin + '/dashboard']);
 });

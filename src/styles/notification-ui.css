@@ -1,0 +1,55 @@
+/* WorkPulse notification controls: append to components.css or import after it. */
+.notif-wrapper .btn,
+.reports-table .btn,
+.modal .btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 13px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  background: var(--card-bg, #fff);
+  color: var(--text, #0f172a);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+}
+.notif-wrapper .btn:hover,
+.reports-table .btn:hover,
+.modal .btn:hover {
+  border-color: var(--primary, #3b82f6);
+  color: var(--primary, #3b82f6);
+}
+.notif-wrapper .btn:focus-visible,
+.reports-table .btn:focus-visible,
+.modal .btn:focus-visible {
+  outline: 3px solid var(--primary, #3b82f6);
+  outline-offset: 3px;
+}
+.notif-wrapper .btn:disabled,
+.modal .btn:disabled { opacity: .55; cursor: wait; }
+.notif-wrapper .btn:first-child,
+.modal .btn-primary {
+  background: var(--primary, #3b82f6);
+  border-color: var(--primary, #3b82f6);
+  color: #fff;
+}
+.notif-wrapper .btn:first-child:hover,
+.modal .btn-primary:hover { background: var(--primary-dark, #2563eb); color: #fff; }
+.reports-table .btn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  background: var(--primary-light, #dbeafe);
+  color: var(--primary-dark, #2563eb);
+  border-color: transparent;
+  font-size: 15px;
+}
+.reports-table .btn:hover { background: var(--primary, #3b82f6); color: #fff; transform: translateY(-1px); }
+.modal .modal-footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }

@@ -1,3 +1,5 @@
+import SendNotificationModal from '../../components/common/SendNotificationModal.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { useMemo, useState } from 'react';
 import { useAllData } from '../../hooks/useAllData.js';
 import { stringifyCSV, downloadCSV } from '../../utils/csvHelpers.js';
@@ -19,6 +21,9 @@ const RANGE_MS = {
 export default function ReportsPage() {
   const { tasks, tickets, meetings, items, profiles, loading, error } = useAllData();
   const { showToast } = useToast();
+  const { currentUser } = useAuth();
+  const canSend = ['head', 'admin'].includes(currentUser?.role);
+  const [recipient, setRecipient] = useState(null);
   const [dateRange, setDateRange] = useState('all');
 
   const filterByRange = (list) => {
@@ -239,6 +244,7 @@ export default function ReportsPage() {
                   <th>Meetings</th>
                   <th>Items</th>
                   <th>Activity</th>
+                  {canSend && <th>Reminder</th>}
                 </tr>
               </thead>
               <tbody>
@@ -281,6 +287,7 @@ export default function ReportsPage() {
                         <span className="activity-bar-label">{e.totalActivity}</span>
                       </div>
                     </td>
+                    {canSend && <td><button type="button" className="btn" title="Send notification" aria-label={`Send reminder to ${e.name || e.username}`} onClick={() => setRecipient(e)}><i className="fas fa-paper-plane" aria-hidden="true"></i></button></td>}
                   </tr>
                 ))}
               </tbody>
@@ -288,6 +295,7 @@ export default function ReportsPage() {
           </div>
         )}
       </div>
+    {recipient && <SendNotificationModal key={recipient.id} recipient={recipient} onClose={() => setRecipient(null)} />}
     </section>
   );
 }

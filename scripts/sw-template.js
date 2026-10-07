@@ -56,3 +56,26 @@ self.addEventListener('message', event => {
     await self.skipWaiting();
   })());
 });
+
+self.addEventListener('push', event => {
+  event.waitUntil((async () => {
+    let payload;
+    try { payload = event.data?.json(); } catch { payload = null; }
+    if (!payload?.id) return;
+    await self.registration.showNotification(payload.title || 'WorkPulse', {
+      body: payload.message || 'You have a new reminder.',
+      tag: `workpulse-${payload.id}`, data: { link: payload.link || '/dashboard' },
+    });
+  })());
+});
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil((async () => {
+    const url = new URL(event.notification.data?.link || '/dashboard', self.location.origin);
+    if (url.origin !== self.location.origin) return;
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const existing = windows.find(client => new URL(client.url).origin === url.origin);
+    if (existing) { await existing.navigate(url.href); await existing.focus(); }
+    else await self.clients.openWindow(url.href);
+  })());
+});
