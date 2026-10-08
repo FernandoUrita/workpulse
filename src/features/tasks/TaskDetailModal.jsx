@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useModalDialog } from '../../hooks/useModalDialog.js';
+import { useState } from 'react';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -6,6 +7,7 @@ import { escapeHtml, isOverdue, isDueToday, formatDate, formatDateTime } from '.
 import { TASK_PRIORITY_LABELS, TASK_CATEGORY_LABELS } from '../../utils/constants.js';
 
 export default function TaskDetailModal({ task, onClose, onToggle, onEdit, onDelete }) {
+  const dialogProps = useModalDialog(Boolean(task), onClose);
   const { addRemark, deleteRemark } = useAppData();
   const { currentUser } = useAuth();
   const { showToast } = useToast();
@@ -36,7 +38,7 @@ export default function TaskDetailModal({ task, onClose, onToggle, onEdit, onDel
   const allHistory = task.auditLog || [];
 
   // History filter
-  const filteredHistory = useMemo(() => {
+  const filteredHistory = (() => {
     if (historyFilter === 'all') return allHistory;
     if (historyFilter === 'updates') {
       return allHistory.filter(e => e.action === 'updated');
@@ -51,7 +53,7 @@ export default function TaskDetailModal({ task, onClose, onToggle, onEdit, onDel
       return allHistory.filter(e => e.action === 'assignee_added' || e.action === 'assignee_removed');
     }
     return allHistory;
-  }, [allHistory, historyFilter]);
+  })();
 
   // Sliced for display
   const remarks = allRemarks.slice(-visibleRemarks); // Latest first (reverse)
@@ -86,10 +88,10 @@ export default function TaskDetailModal({ task, onClose, onToggle, onEdit, onDel
 
   return (
     <div className="modal show task-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content" style={{ maxWidth: '640px' }}>
+      <div {...dialogProps} className="modal-content" style={{ maxWidth: '640px' }}>
         <div className="modal-header">
           <h3><i className="fas fa-clipboard-check"></i> Task Details</h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         {/* ─── TASK HEADER ─── */}

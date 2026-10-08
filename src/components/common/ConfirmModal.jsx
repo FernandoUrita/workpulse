@@ -1,9 +1,11 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 export default function ConfirmModal({ show, title, message, preview, confirmText, onConfirm, onCancel }) {
+  const dialogProps = useModalDialog(show, onCancel);
   if (!show) return null;
 
   return (
     <div className="modal show confirm-modal" onClick={(e) => e.target === e.currentTarget && onCancel()}>
-      <div className="modal-content">
+      <div {...dialogProps} className="modal-content">
         <div className="confirm-icon">
           <i className="fas fa-exclamation-triangle"></i>
         </div>

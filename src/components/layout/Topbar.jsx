@@ -8,6 +8,10 @@ const PAGE_TITLES = {
   '/items': 'Items Management',
   '/mom': 'MOM Templates',
   '/settings': 'Settings',
+  '/tickets': 'Tickets',
+  '/reports': 'Team Reports',
+  '/users': 'Users & Access',
+  '/activity': 'Activity',
 };
 
 export default function Topbar({ currentPath, onMenuClick, onOpenCommandPalette }) {

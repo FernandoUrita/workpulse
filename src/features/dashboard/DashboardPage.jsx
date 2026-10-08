@@ -83,7 +83,7 @@ export default function DashboardPage() {
     .slice(0, 8);
 
   return (
-    <section className="module">
+    <section className="module"><div className="module-header"><div className="module-heading"><h3>Your workspace at a glance</h3><p className="module-description">Review your workload and see what needs attention next.</p></div></div>
       {/* ─── STAT CARDS ──────────────────────── */}
       <div className="dashboard-grid">
         <div className="stat-card">

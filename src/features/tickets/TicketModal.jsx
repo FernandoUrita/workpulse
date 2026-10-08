@@ -1,3 +1,4 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useAppData } from '../../context/AppDataContext.jsx';
@@ -25,6 +26,7 @@ const EMPTY = {
 };
 
 export default function TicketModal({ show, ticket, defaultTaskType = 'support', onClose, onSave }) {
+  const dialogProps = useModalDialog(show, onClose);
   const { tickets } = useAppData();
   const { showToast } = useToast();
   const [form, setForm] = useState(EMPTY);
@@ -115,13 +117,13 @@ export default function TicketModal({ show, ticket, defaultTaskType = 'support',
 
   return (
     <div className="modal show ticket-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content" style={{ maxWidth: '680px' }}>
+      <div {...dialogProps} className="modal-content" style={{ maxWidth: '680px' }}>
         <div className="modal-header">
           <h3>
             <i className={`fas fa-${ticket ? 'edit' : 'ticket-alt'}`}></i>
             {ticket ? ' Edit Ticket' : ' New Ticket'}
           </h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

@@ -1,3 +1,4 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -18,6 +19,7 @@ const EMPTY = {
 };
 
 export default function MeetingModal({ show, meeting, onClose, onSave }) {
+  const dialogProps = useModalDialog(show, onClose);
   const { currentUser } = useAuth();
   const [form, setForm] = useState(EMPTY);
   const [attendees, setAttendees] = useState([]);
@@ -164,13 +166,13 @@ export default function MeetingModal({ show, meeting, onClose, onSave }) {
 
   return (
     <div className="modal show" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content modal-large">
+      <div {...dialogProps} className="modal-content modal-large">
         <div className="modal-header">
           <h3>
             <i className={`fas fa-${meeting ? 'edit' : 'calendar-plus'}`}></i>
             {meeting ? ' Edit Meeting' : ' Schedule New Meeting'}
           </h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

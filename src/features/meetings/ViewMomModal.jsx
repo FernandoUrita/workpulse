@@ -1,13 +1,15 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { escapeHtml } from '../../utils/helpers.js';
 
 export default function ViewMomModal({ show, meeting, onClose }) {
+  const dialogProps = useModalDialog(show && Boolean(meeting?.mom), onClose);
   if (!show || !meeting || !meeting.mom) return null;
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(meeting.mom);
       alert('MOM copied to clipboard!');
-    } catch (err) {
+    } catch {
       alert('Failed to copy. Please try again.');
     }
   };
@@ -32,10 +34,10 @@ export default function ViewMomModal({ show, meeting, onClose }) {
 
   return (
     <div className="modal show" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content modal-large">
+      <div {...dialogProps} className="modal-content modal-large">
         <div className="modal-header">
           <h3><i className="fas fa-file-alt"></i> MOM — {escapeHtml(meeting.title)}</h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

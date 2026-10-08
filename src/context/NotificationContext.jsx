@@ -1,7 +1,9 @@
+import { REMINDER_LEVELS } from '../utils/reminderLevels.js';
 import { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase.js';
 import { useAuth } from './AuthContext.jsx';
 import { useAppData } from './AppDataContext.jsx';
+import { createNotificationTracker } from '../utils/notificationDelivery.js';
 import { isOverdue, isDueToday } from '../utils/helpers.js';
 
 const NotificationContext = createContext(null);
@@ -107,6 +109,9 @@ export function NotificationProvider({ children }) {
   const { currentUser } = useAuth();
   const { tasks, meetings, items } = useAppData();
 
+  const [liveAlerts, setLiveAlerts] = useState([]);
+  const tracker = useRef(null);
+  const [realtimeStatus, setRealtimeStatus] = useState('connecting');
   const [dbNotifications, setDbNotifications] = useState([]);
   const [readIds, setReadIds] = useState(new Set());
   const [dismissedIds, setDismissedIds] = useState(new Set());
@@ -127,6 +132,8 @@ export function NotificationProvider({ children }) {
         .order('created_at', { ascending: false }).limit(50);
       if (fetchError) throw fetchError;
       if (activeUser.current !== userId || request !== requestSequence.current) return;
+      const fresh = tracker.current?.snapshot(data || []) || [];
+      if (fresh.length) setLiveAlerts(prev => [...prev, ...fresh].slice(-30));
       setDbNotifications(data || []);
       setError(null);
     } catch (err) {
@@ -142,6 +149,9 @@ export function NotificationProvider({ children }) {
     // Reset account-scoped state when the external auth identity changes.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDbNotifications([]);
+    setLiveAlerts([]);
+    tracker.current = createNotificationTracker();
+    setRealtimeStatus('connecting');
     setReadIds(new Set());
     setDismissedIds(new Set());
     setError(null);
@@ -154,19 +164,31 @@ export function NotificationProvider({ children }) {
       .on('postgres_changes', {
         event: '*', schema: 'public', table: 'notifications',
         filter: `user_id=eq.${userId}`,
-      }, refresh)
+      }, payload => {
+        if (!alive) return;
+        const row = payload.new;
+        if (payload.eventType === 'INSERT' && row?.user_id === userId) {
+          const fresh = tracker.current?.insert(row) || [];
+          if (fresh.length) setLiveAlerts(prev => [...prev, ...fresh].slice(-30));
+        }
+        refresh();
+      })
       .subscribe(status => {
         if (!alive) return;
+        setRealtimeStatus(status.toLowerCase());
         if (status === 'SUBSCRIBED') refresh();
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          setError('Live updates disconnected. Retry or reopen the page.');
+          setRealtimeStatus('fallback polling');
         }
       });
     refresh();
     const onFocus = () => refresh();
+    const poll = setInterval(refresh, 8000);
     window.addEventListener('focus', onFocus);
     return () => {
       alive = false;
+      clearInterval(poll);
+      requestSequence.current += 1;
       window.removeEventListener('focus', onFocus);
       supabase.removeChannel(channel);
     };
@@ -193,6 +215,7 @@ export function NotificationProvider({ children }) {
         id: n.id,
         type: n.type,
         severity: n.severity,
+        reminder_level: n.reminder_level,
         title: n.title,
         message: n.message,
         entityType: n.entity_type,
@@ -229,7 +252,7 @@ export function NotificationProvider({ children }) {
   const updateFlags = useCallback(async (ids, field) => {
     const owner = userId;
     if (!owner) return false;
-    const dbIds = ids.filter(id => dbNotifications.some(n => n.id === id));
+    const dbIds = ids.filter(id => !id.startsWith('auto-'));
     try {
       if (dbIds.length) {
         const { data, error: updateError } = await supabase.from('notifications')
@@ -250,7 +273,7 @@ export function NotificationProvider({ children }) {
       }
       return false;
     }
-  }, [userId, dbNotifications]);
+  }, [userId]);
 
   const markAsRead = useCallback(id => updateFlags([id], 'read'), [updateFlags]);
   const markAllAsRead = useCallback(() => updateFlags(notifications.map(n => n.id), 'read'), [updateFlags, notifications]);
@@ -258,15 +281,13 @@ export function NotificationProvider({ children }) {
   const dismissAll = useCallback(() => updateFlags(notifications.map(n => n.id), 'dismissed'), [updateFlags, notifications]);
 
   // ─── SEND MANUAL NOTIFICATION (Head → Employee) ─
-  const sendNotification = useCallback(async ({ userId, title, message, type = 'manual', severity = 'info', link = null }) => {
-<<<<<<< HEAD
+  const sendNotification = useCallback(async ({ userId, title, message, type = 'manual', severity = 'info', reminderLevel = null, link = null }) => {
     if (!currentUser || !['head', 'admin'].includes(currentUser.role)) return null;
     if (!userId || !title?.trim() || !message?.trim() || title.length > 120 || message.length > 2000) return null;
+    if (reminderLevel !== null && !Object.hasOwn(REMINDER_LEVELS, reminderLevel)) return null;
+    if (reminderLevel) severity = REMINDER_LEVELS[reminderLevel].severity;
     if (!['info', 'warning', 'critical'].includes(severity)) return null;
     if (link && (!link.startsWith('/') || link.startsWith('//'))) return null;
-=======
-    if (!currentUser) return null;
->>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
 
     try {
       const { error } = await supabase
@@ -276,15 +297,12 @@ export function NotificationProvider({ children }) {
           sender_id: currentUser.id,
           type,
           severity,
+          ...(reminderLevel ? { reminder_level: reminderLevel } : {}),
           title: title.trim(),
           message: message.trim(),
           link,
         });
-<<<<<<< HEAD
 
-=======
-      
->>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
       if (error) throw error;
       return { success: true };
     } catch (err) {
@@ -296,6 +314,8 @@ export function NotificationProvider({ children }) {
   return (
     <NotificationContext.Provider value={{
       notifications,
+      liveAlerts,
+      realtimeStatus,
       unreadCount,
       readIds: effectiveReadIds,
       dismissedIds: effectiveDismissedIds,

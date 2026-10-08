@@ -1,7 +1,9 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { escapeHtml, formatDate, formatDateTime, getTargetDateStatus } from '../../utils/helpers.js';
 import { ITEM_TYPE_CONFIG, ITEM_STATUS_LABELS, ITEM_PRIORITY_LABELS } from '../../utils/constants.js';
 
 export default function ItemDetailModal({ show, item, onClose, onEdit, onDelete, onCheckin }) {
+  const dialogProps = useModalDialog(show && Boolean(item), onClose);
   if (!show || !item) return null;
 
   const typeConfig = ITEM_TYPE_CONFIG[item.type] || ITEM_TYPE_CONFIG.custom;
@@ -30,10 +32,10 @@ export default function ItemDetailModal({ show, item, onClose, onEdit, onDelete,
 
   return (
     <div className="modal show item-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content">
+      <div {...dialogProps} className="modal-content">
         <div className="modal-header">
           <h3><i className="fas fa-cube"></i> Item Details</h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

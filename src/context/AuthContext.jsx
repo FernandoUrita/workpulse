@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { disablePush } from '../pwa/push.js';
 import { supabase } from '../lib/supabase.js';
 
@@ -7,9 +7,12 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const profileRequest = useRef(0);
+  const mounted = useRef(true);
 
   // ─── FETCH PROFILE ──────────────────────────────
   const fetchProfile = async (userId) => {
+    const request = ++profileRequest.current;
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -17,34 +20,41 @@ export function AuthProvider({ children }) {
         .eq('id', userId)
         .single();
 
+      if (!mounted.current || request !== profileRequest.current) return;
       if (error) {
         console.error('Error fetching profile:', error);
         setCurrentUser(null);
+      } else if (data.is_active === false) {
+        setCurrentUser(null);
+        await supabase.auth.signOut();
       } else {
-        setCurrentUser({
+        const nextUser = {
           id: data.id,
           username: data.username,
           name: data.name,
           email: data.email,
           role: data.role,
           avatar_url: data.avatar_url,
-        });
+        };
+        // Preserve identity during unchanged access checks so data hooks do not reload.
+        setCurrentUser(previous => previous && Object.keys(nextUser).every(key => previous[key] === nextUser[key]) ? previous : nextUser);
       }
     } catch (err) {
       console.error('fetchProfile error:', err);
-      setCurrentUser(null);
+      if (mounted.current && request === profileRequest.current) setCurrentUser(null);
     } finally {
-      setLoading(false);
+      if (mounted.current && request === profileRequest.current) setLoading(false);
     }
   };
 
   // ─── INITIAL SESSION ────────────────────────────
   useEffect(() => {
+    mounted.current = true;
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         fetchProfile(session.user.id);
-      } else {
+      } else if (mounted.current) {
         setLoading(false);
       }
     });
@@ -53,15 +63,25 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (session?.user) {
-          fetchProfile(session.user.id);
+          setTimeout(() => { if (mounted.current) void fetchProfile(session.user.id); }, 0);
         } else {
+          profileRequest.current++;
           setCurrentUser(null);
           setLoading(false);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Refresh access on focus and every 30 seconds; database RLS applies immediately.
+    const refreshAccess = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) await fetchProfile(session.user.id);
+    };
+    const interval = setInterval(refreshAccess, 30000);
+    window.addEventListener('focus', refreshAccess);
+    // Request counter invalidates asynchronous responses, not a DOM ref.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => { mounted.current = false; profileRequest.current++; subscription.unsubscribe(); clearInterval(interval); window.removeEventListener('focus', refreshAccess); };
   }, []);
 
   // ─── LOGIN ──────────────────────────────────────
@@ -175,6 +195,8 @@ export function AuthProvider({ children }) {
   );
 }
 
+// Shared context hook intentionally lives beside its provider.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');

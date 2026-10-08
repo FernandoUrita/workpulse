@@ -232,7 +232,7 @@ export default function TasksPage() {
   return (
     <section className="module">
       <div className="module-header">
-        <h3><i className="fas fa-tasks"></i> Task Management</h3>
+        <div className="module-heading"><h3><i className="fas fa-tasks"></i> Task Management</h3><p className="module-description">Plan your work, track progress, and keep priorities clear.</p></div>
         <div className="module-actions">
           <div className="view-toggle">
             <button
@@ -342,7 +342,7 @@ export default function TasksPage() {
       <div className="toolbar">
         <div className="search-box">
           <i className="fas fa-search"></i>
-          <input
+          <input aria-label="Search tasks by title or description..."
             type="text"
             placeholder="Search tasks by title or description..."
             value={search}
@@ -350,7 +350,7 @@ export default function TasksPage() {
           />
         </div>
         <div className="filter-group">
-          <select value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
+          <select aria-label="Filter by category" value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
             <option value="all">All Categories</option>
             <option value="work">💼 Work</option>
             <option value="personal">🏠 Personal</option>

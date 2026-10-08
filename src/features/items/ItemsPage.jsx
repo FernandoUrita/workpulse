@@ -202,7 +202,7 @@ export default function ItemsPage() {
   return (
     <section className="module">
       <div className="module-header">
-        <h3><i className="fas fa-boxes-stacked"></i> Items Tracker</h3>
+        <div className="module-heading"><h3><i className="fas fa-boxes-stacked"></i> Items Tracker</h3><p className="module-description">Monitor projects, issues, and follow-ups in one place.</p></div>
         <div className="module-actions">
           <button className="primary-btn" onClick={handleAdd}>
             <i className="fas fa-plus"></i> Add Item
@@ -261,7 +261,7 @@ export default function ItemsPage() {
       <div className="toolbar">
         <div className="search-box">
           <i className="fas fa-search"></i>
-          <input
+          <input aria-label="Search items by title, client, or tags..."
             type="text"
             placeholder="Search items by title, client, or tags..."
             value={search}
@@ -269,7 +269,7 @@ export default function ItemsPage() {
           />
         </div>
         <div className="filter-group">
-          <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
+          <select aria-label="Filter by status" value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
             <option value="all">All Status</option>
             <option value="pending">⏳ Pending</option>
             <option value="in-progress">🟡 In Progress</option>
@@ -278,7 +278,7 @@ export default function ItemsPage() {
             <option value="on-hold">⏸️ On Hold</option>
             <option value="cancelled">❌ Cancelled</option>
           </select>
-          <select value={priorityFilter} onChange={(e) => { setPriorityFilter(e.target.value); setPage(1); }}>
+          <select aria-label="Filter by priority" value={priorityFilter} onChange={(e) => { setPriorityFilter(e.target.value); setPage(1); }}>
             <option value="all">All Priority</option>
             <option value="critical">🚨 Critical</option>
             <option value="high">🔴 High</option>

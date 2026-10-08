@@ -1,9 +1,11 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { generateMomFromTemplate } from '../../utils/helpers.js';
 
 export default function MomModal({ show, meeting, onClose, onComplete }) {
+  const dialogProps = useModalDialog(show && Boolean(meeting), onClose);
   const { momTemplate } = useAppData();
   const { showToast } = useToast();
   const [momText, setMomText] = useState('');
@@ -45,10 +47,10 @@ export default function MomModal({ show, meeting, onClose, onComplete }) {
 
   return (
     <div className="modal show" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content modal-large">
+      <div {...dialogProps} className="modal-content modal-large">
         <div className="modal-header">
           <h3><i className="fas fa-file-alt"></i> Minutes of Meeting (MOM)</h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

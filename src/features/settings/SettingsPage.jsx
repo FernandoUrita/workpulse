@@ -62,7 +62,7 @@ export default function SettingsPage() {
   const totalItems = tasks.length + meetings.length + items.length;
 
   return (
-    <section className="module">
+    <section className="module"><div className="module-header"><div className="module-heading"><h3>Settings</h3><p className="module-description">Manage your profile, appearance, and workspace preferences.</p></div></div>
       <div className="settings-container">
         {/* ─── PROFILE ─────────────────────────── */}
         <div className="settings-group">

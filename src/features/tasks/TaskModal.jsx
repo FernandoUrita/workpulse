@@ -1,3 +1,4 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -13,6 +14,7 @@ const EMPTY = {
 };
 
 export default function TaskModal({ show, task, defaultDueDate, onClose, onSave }) {
+  const dialogProps = useModalDialog(show, onClose);
   const [form, setForm] = useState(EMPTY);
   const [titleError, setTitleError] = useState(false);
   const [assigneeInput, setAssigneeInput] = useState('');
@@ -99,13 +101,13 @@ export default function TaskModal({ show, task, defaultDueDate, onClose, onSave 
 
   return (
     <div className="modal show task-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content">
+      <div {...dialogProps} className="modal-content">
         <div className="modal-header">
           <h3>
             <i className={`fas fa-${task ? 'edit' : 'plus-circle'}`}></i>
             {task ? ' Edit Task' : ' Add New Task'}
           </h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

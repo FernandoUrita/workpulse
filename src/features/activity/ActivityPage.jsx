@@ -119,7 +119,7 @@ export default function ActivityPage() {
   return (
     <section className="module">
       <div className="module-header">
-        <h3><i className="fas fa-stream"></i> Activity Log</h3>
+        <div className="module-heading"><h3><i className="fas fa-stream"></i> Activity Log</h3><p className="module-description">See recent work updates and changes across your modules.</p></div>
         <div className="module-actions">
           {hasActiveFilters && (
             <button className="secondary-btn" onClick={clearFilters}>
@@ -147,7 +147,7 @@ export default function ActivityPage() {
       <div className="activity-filters">
         <div className="search-box">
           <i className="fas fa-search"></i>
-          <input
+          <input aria-label="Search activities..."
             type="text"
             placeholder="Search activities..."
             value={search}

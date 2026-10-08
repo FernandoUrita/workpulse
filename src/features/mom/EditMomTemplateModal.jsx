@@ -1,7 +1,9 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
 
 export default function EditMomTemplateModal({ show, currentTemplate, onClose, onSave }) {
+  const dialogProps = useModalDialog(show, onClose);
   const [template, setTemplate] = useState('');
   const { showToast } = useToast();
 
@@ -30,10 +32,10 @@ export default function EditMomTemplateModal({ show, currentTemplate, onClose, o
 
   return (
     <div className="modal show edit-template-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content">
+      <div {...dialogProps} className="modal-content">
         <div className="modal-header">
           <h3><i className="fas fa-pen-fancy"></i> Edit MOM Template</h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

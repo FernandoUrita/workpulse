@@ -1,6 +1,7 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
-import { escapeHtml, todayISO } from '../../utils/helpers.js';
+import { escapeHtml } from '../../utils/helpers.js';
 
 const QUICK_NOTES = [
   { emoji: '✅', label: 'All OK', note: 'All systems operational ✅' },
@@ -10,6 +11,7 @@ const QUICK_NOTES = [
 ];
 
 export default function CheckinModal({ show, item, onClose, onSave }) {
+  const dialogProps = useModalDialog(show && Boolean(item), onClose);
   const [note, setNote] = useState('');
   const [nextDate, setNextDate] = useState('');
   const { showToast } = useToast();
@@ -37,10 +39,10 @@ export default function CheckinModal({ show, item, onClose, onSave }) {
 
   return (
     <div className="modal show checkin-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content">
+      <div {...dialogProps} className="modal-content">
         <div className="modal-header">
           <h3><i className="fas fa-clipboard-check"></i> Log Check-in</h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

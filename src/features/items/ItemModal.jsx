@@ -1,3 +1,4 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
 import { ITEM_STATUS_OPTIONS, ITEM_PRIORITY_OPTIONS } from '../../utils/constants.js';
@@ -32,6 +33,7 @@ const TYPE_OPTIONS = [
 ];
 
 export default function ItemModal({ show, item, onClose, onSave }) {
+  const dialogProps = useModalDialog(show, onClose);
   const [form, setForm] = useState(EMPTY);
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
@@ -147,13 +149,13 @@ export default function ItemModal({ show, item, onClose, onSave }) {
 
   return (
     <div className="modal show item-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content">
+      <div {...dialogProps} className="modal-content">
         <div className="modal-header">
           <h3>
             <i className={`fas fa-${item ? 'edit' : 'plus-circle'}`}></i>
             {item ? ' Edit Item' : ' Add New Item'}
           </h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-body">

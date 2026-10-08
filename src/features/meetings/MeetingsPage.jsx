@@ -157,7 +157,7 @@ export default function MeetingsPage() {
   return (
     <section className="module">
       <div className="module-header">
-        <h3><i className="fas fa-calendar-alt"></i> Meeting Management</h3>
+        <div className="module-heading"><h3><i className="fas fa-calendar-alt"></i> Meeting Management</h3><p className="module-description">Keep schedules, agendas, and meeting minutes together.</p></div>
         <div className="module-actions">
           <button className="primary-btn" onClick={handleAdd}>
             <i className="fas fa-plus"></i> New Meeting
@@ -168,7 +168,7 @@ export default function MeetingsPage() {
       <div className="toolbar">
         <div className="search-box">
           <i className="fas fa-search"></i>
-          <input
+          <input aria-label="Search meetings..."
             type="text"
             placeholder="Search meetings..."
             value={search}
@@ -176,7 +176,7 @@ export default function MeetingsPage() {
           />
         </div>
         <div className="filter-group">
-          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <select aria-label="Filter records" value={filter} onChange={(e) => setFilter(e.target.value)}>
             <option value="all">All</option>
             <option value="upcoming">📅 Upcoming</option>
             <option value="past">⏰ Past</option>

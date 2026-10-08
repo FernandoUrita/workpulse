@@ -7,6 +7,7 @@ import LoginPage from './components/auth/LoginPage.jsx';
 import RegisterPage from './components/auth/RegisterPage.jsx';
 import RoleGuard from './components/auth/RoleGuard.jsx';
 
+const UsersPage = lazy(() => import('./features/admin/UsersPage.jsx'));
 const ReportsPage = lazy(() => import('./features/reports/ReportsPage.jsx'));
 const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage.jsx'));
 const TasksPage = lazy(() => import('./features/tasks/TasksPage.jsx'));
@@ -109,6 +110,7 @@ export default function App() {
               <ReportsPage />
             </RoleGuard>
           } />
+          <Route path="/users" element={<RoleGuard allowedRoles={['admin']}><UsersPage /></RoleGuard>} />
           <Route path="/activity" element={<ActivityPage />} />
         </Route>
 

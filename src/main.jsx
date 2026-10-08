@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { NotificationExperience } from './context/NotificationExperience.jsx'
+import './styles/notification-alerts.css'
 import App from './App.jsx'
 
 // Global styles
@@ -11,6 +13,8 @@ import './styles/polish.css'
 import './styles/pwa.css'
 import './styles/notification-ui.css';
 import { startPwa } from './pwa/client.js'
+
+import './styles/ui-refresh.css'
 
 // Context Providers
 import { ToastProvider } from './context/ToastContext.jsx'
@@ -29,7 +33,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <AuthProvider>
             <AppDataProvider>
               <NotificationProvider>
-                <App />
+                <NotificationExperience>
+                  <App />
+                </NotificationExperience>
               </NotificationProvider>
             </AppDataProvider>
           </AuthProvider>

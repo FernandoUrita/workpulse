@@ -1,16 +1,16 @@
+import EmployeeReportModal from '../../components/common/EmployeeReportModal.jsx';
 import SendNotificationModal from '../../components/common/SendNotificationModal.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useMemo, useState } from 'react';
 import { useAllData } from '../../hooks/useAllData.js';
 import { stringifyCSV, downloadCSV } from '../../utils/csvHelpers.js';
 import { useToast } from '../../context/ToastContext.jsx';
-import SendNotificationModal from './SendNotificationModal.jsx';
 
 const DATE_RANGES = [
   { id: 'all', label: 'All Time' },
-  { id: 'today', label: 'Today' },
-  { id: 'week', label: 'This Week' },
-  { id: 'month', label: 'This Month' },
+  { id: 'today', label: 'Last 24 hours' },
+  { id: 'week', label: 'Last 7 days' },
+  { id: 'month', label: 'Last 30 days' },
 ];
 
 const RANGE_MS = {
@@ -24,23 +24,16 @@ export default function ReportsPage() {
   const { showToast } = useToast();
   const { currentUser } = useAuth();
   const canSend = ['head', 'admin'].includes(currentUser?.role);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [recipient, setRecipient] = useState(null);
+  const [reportNow, setReportNow] = useState(() => Date.now());
   const [dateRange, setDateRange] = useState('all');
-  const [notifyTarget, setNotifyTarget] = useState(null);
 
-  const filterByRange = (list) => {
-    if (dateRange === 'all') return list;
-    const cutoff = Date.now() - RANGE_MS[dateRange];
-    return list.filter(item => {
-      const ts = item.created_at ? new Date(item.created_at).getTime() : 0;
-      return ts >= cutoff;
-    });
-  };
-
-  const filteredTasks = useMemo(() => filterByRange(tasks), [tasks, dateRange]);
-  const filteredTickets = useMemo(() => filterByRange(tickets), [tickets, dateRange]);
-  const filteredMeetings = useMemo(() => filterByRange(meetings), [meetings, dateRange]);
-  const filteredItems = useMemo(() => filterByRange(items), [items, dateRange]);
+  const [filteredTasks, filteredTickets, filteredMeetings, filteredItems] = useMemo(() => {
+    const cutoff = reportNow - (RANGE_MS[dateRange] || 0);
+    const filter = list => dateRange === 'all' ? list : list.filter(row => Date.parse(row.created_at || '') >= cutoff);
+    return [tasks, tickets, meetings, items].map(filter);
+  }, [tasks, tickets, meetings, items, dateRange, reportNow]);
 
   const summary = useMemo(() => ({
     tasks: {
@@ -125,7 +118,7 @@ export default function ReportsPage() {
     return (
       <section className="module">
         <div className="module-header">
-          <h3><i className="fas fa-chart-line"></i> Reports</h3>
+          <div className="module-heading"><h3><i className="fas fa-chart-line"></i> Reports</h3><p className="module-description">Review team workload and send focused reminders.</p></div>
         </div>
         <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-secondary)' }}>
           <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px', marginBottom: '12px' }}></i>
@@ -169,7 +162,7 @@ export default function ReportsPage() {
             key={r.id}
             type="button"
             className={`reports-filter-chip ${dateRange === r.id ? 'active' : ''}`}
-            onClick={() => setDateRange(r.id)}
+            onClick={() => { setReportNow(Date.now()); setDateRange(r.id); }}
           >
             {r.label}
           </button>
@@ -246,21 +239,17 @@ export default function ReportsPage() {
                   <th>Meetings</th>
                   <th>Items</th>
                   <th>Activity</th>
-<<<<<<< HEAD
                   {canSend && <th>Reminder</th>}
-=======
-                  <th></th>
->>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
                 </tr>
               </thead>
               <tbody>
                 {employeeStats.map(e => (
-                  <tr key={e.id}>
+                  <tr key={e.id} className="reports-employee-row" onClick={() => setSelectedEmployeeId(e.id)}>
                     <td>
                       <div className="reports-user-cell">
                         <i className="fas fa-user-circle"></i>
                         <div>
-                          <strong>{e.name || e.username}</strong>
+                          <button className="reports-employee-open" type="button" aria-label={`View report for ${e.name || e.username}`} onClick={event => { event.stopPropagation(); setSelectedEmployeeId(e.id); }}><strong>{e.name || e.username}</strong></button>
                           <span>@{e.username}</span>
                         </div>
                       </div>
@@ -293,20 +282,7 @@ export default function ReportsPage() {
                         <span className="activity-bar-label">{e.totalActivity}</span>
                       </div>
                     </td>
-<<<<<<< HEAD
-                    {canSend && <td><button type="button" className="btn" title="Send notification" aria-label={`Send reminder to ${e.name || e.username}`} onClick={() => setRecipient(e)}><i className="fas fa-paper-plane" aria-hidden="true"></i></button></td>}
-=======
-                    <td>
-                      <button
-                        type="button"
-                        className="send-reminder-btn"
-                        onClick={() => setNotifyTarget(e)}
-                        title="Send notification"
-                      >
-                        <i className="fas fa-paper-plane"></i>
-                      </button>
-                    </td>
->>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
+                    {canSend && <td><button type="button" className="btn" title="Send notification" aria-label={`Send reminder to ${e.name || e.username}`} onClick={event => { event.stopPropagation(); setRecipient(e); }}><i className="fas fa-paper-plane" aria-hidden="true"></i></button></td>}
                   </tr>
                 ))}
               </tbody>
@@ -314,16 +290,8 @@ export default function ReportsPage() {
           </div>
         )}
       </div>
-<<<<<<< HEAD
+    {selectedEmployeeId && profiles.find(profile => profile.id === selectedEmployeeId) && <EmployeeReportModal key={selectedEmployeeId} now={reportNow} employee={profiles.find(profile => profile.id === selectedEmployeeId)} collections={{ tasks: filteredTasks, tickets: filteredTickets, meetings: filteredMeetings, items: filteredItems }} rangeLabel={DATE_RANGES.find(range => range.id === dateRange).label} onClose={() => setSelectedEmployeeId(null)} onSend={canSend ? employee => { setSelectedEmployeeId(null); setRecipient(employee); } : null} />}
     {recipient && <SendNotificationModal key={recipient.id} recipient={recipient} onClose={() => setRecipient(null)} />}
-=======
-      
-      <SendNotificationModal
-        show={!!notifyTarget}
-        recipient={notifyTarget}
-        onClose={() => setNotifyTarget(null)}
-      />
->>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
     </section>
   );
 }

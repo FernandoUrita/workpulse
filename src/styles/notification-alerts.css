@@ -1,0 +1,33 @@
+.notif-preferences { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.notif-preferences .secondary-btn { font-size: 11px; padding: 8px 10px; border-radius: 9px; }
+.notif-preferences p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; width: 100%; }
+.wp-alert-stack { position: fixed; right: 24px; bottom: 24px; z-index: 12000; width: min(380px, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+.wp-alert-card { pointer-events: auto; display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 16px; background: var(--card-bg); color: var(--text); box-shadow: 0 12px 40px rgba(15,23,42,.18); animation: wp-alert-in .2s ease-out; }
+.wp-alert-warning { border-left-color: var(--warning); }
+.wp-alert-critical { border-left-color: var(--danger); }
+.wp-alert-icon { color: var(--primary); background: var(--primary-light); width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; flex-shrink: 0; }
+.wp-alert-open { border: 0; background: transparent; color: inherit; padding: 0; text-align: left; display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; font: inherit; }
+.wp-alert-label { color: var(--text-secondary); font-size: 10px; font-weight: 700; letter-spacing: .1em; }
+.wp-alert-open strong { font-size: 14px; overflow-wrap: anywhere; }
+.wp-alert-open > span:not(.wp-alert-label) { font-size: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.wp-alert-open small { font-size: 11px; color: var(--primary); }
+.wp-alert-close { border: 0; background: transparent; color: var(--text-secondary); font-size: 22px; line-height: 1; padding: 2px 5px; border-radius: 6px; }
+.wp-alert-close:hover { background: var(--bg); }
+.wp-alert-open:focus-visible, .wp-alert-close:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+@keyframes wp-alert-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) { .wp-alert-stack { right: 16px; bottom: 16px; } }
+@media (prefers-reduced-motion: reduce) { .wp-alert-card { animation: none; } }
+
+/* Shared colors for real reminders in the popup and bell. */
+.wp-alert-level-urgent, .notif-item.reminder-level-urgent { --reminder-color: #ef4444; }
+.wp-alert-level-month, .notif-item.reminder-level-month { --reminder-color: #f97316; }
+.wp-alert-level-week, .notif-item.reminder-level-week { --reminder-color: #eab308; }
+.wp-alert-level-daily, .notif-item.reminder-level-daily { --reminder-color: #3b82f6; }
+.wp-alert-level-normal, .notif-item.reminder-level-normal { --reminder-color: #10b981; }
+.wp-alert-card[class*="wp-alert-level-"] { border-left-color: var(--reminder-color); }
+.wp-alert-card[class*="wp-alert-level-"] .wp-alert-icon { color: var(--reminder-color); background: color-mix(in srgb, var(--reminder-color) 15%, var(--card-bg)); }
+.wp-alert-card[class*="wp-alert-level-"] .wp-alert-open small { color: var(--reminder-color); }
+.notif-item[class*="reminder-level-"] .notif-item-icon { color: var(--reminder-color); background: color-mix(in srgb, var(--reminder-color) 15%, var(--card-bg)); }
+.notif-reminder-label { font-size: 11px; font-weight: 600; color: var(--reminder-color); margin: 4px 0; }
+.reminder-preview { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 8px; }
+.reminder-preview > span { width: 12px; height: 12px; border-radius: 50%; background: var(--reminder-color); }

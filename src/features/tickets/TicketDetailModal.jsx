@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useModalDialog } from '../../hooks/useModalDialog.js';
+import { useState } from 'react';
 import { useAppData } from '../../context/AppDataContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -16,6 +17,7 @@ const ACTION_META = {
 };
 
 export default function TicketDetailModal({ ticket, onClose, onEdit, onDelete }) {
+  const dialogProps = useModalDialog(Boolean(ticket), onClose);
   const { addTicketRemark, deleteTicketRemark } = useAppData();
   const { currentUser } = useAuth();
   const { showToast } = useToast();
@@ -34,7 +36,7 @@ export default function TicketDetailModal({ ticket, onClose, onEdit, onDelete })
     const allRemarks = ticket.comments || [];
   const allHistory = ticket.auditLog || [];
 
-  const filteredHistory = useMemo(() => {
+  const filteredHistory = (() => {
     if (historyFilter === 'all') return allHistory;
     if (historyFilter === 'updates') return allHistory.filter(e => e.action === 'updated');
     if (historyFilter === 'remarks') return allHistory.filter(e => e.action === 'remark_added');
@@ -42,7 +44,7 @@ export default function TicketDetailModal({ ticket, onClose, onEdit, onDelete })
       return allHistory.filter(e => e.changes && (e.changes.status || e.changes.priority));
     }
     return allHistory;
-  }, [allHistory, historyFilter]);
+  })();
 
   const remarks = allRemarks.slice(-visibleRemarks);
   const history = [...filteredHistory].reverse().slice(0, visibleHistory);
@@ -74,13 +76,13 @@ export default function TicketDetailModal({ ticket, onClose, onEdit, onDelete })
 
   return (
     <div className="modal show ticket-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content" style={{ maxWidth: '680px' }}>
+      <div {...dialogProps} className="modal-content" style={{ maxWidth: '680px' }}>
         <div className="modal-header">
           <h3>
             <i className="fas fa-ticket-alt"></i>
             Ticket #{ticket.ticketNo || '—'}
           </h3>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={onClose}>&times;</button>
         </div>
 
         {/* ─── HEADER ─── */}

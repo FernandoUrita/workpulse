@@ -194,7 +194,7 @@ export default function TicketsPage() {
   return (
     <section className="module">
       <div className="module-header">
-        <h3><i className="fas fa-ticket-alt"></i> Ticket Monitoring</h3>
+        <div className="module-heading"><h3><i className="fas fa-ticket-alt"></i> Ticket Monitoring</h3><p className="module-description">Track client concerns, ownership, and the next action.</p></div>
           <div className="module-actions">
             <div className="view-toggle">
               <button
@@ -288,7 +288,7 @@ export default function TicketsPage() {
       <div className="toolbar">
         <div className="search-box">
           <i className="fas fa-search"></i>
-          <input
+          <input aria-label="Search by ticket no, client, subject..."
             type="text"
             placeholder="Search by ticket no, client, subject..."
             value={search}
@@ -296,7 +296,7 @@ export default function TicketsPage() {
           />
         </div>
         <div className="filter-group">
-          <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
+          <select aria-label="Filter by status" value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
             <option value="all">All Statuses</option>
             <option value="Open">🟢 Open</option>
             <option value="Hypercare">🔥 Hypercare</option>
@@ -304,21 +304,21 @@ export default function TicketsPage() {
             <option value="Closed">✅ Closed</option>
             <option value="On Hold">⏸️ On Hold</option>
           </select>
-          <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}>
+          <select aria-label="Filter by category" value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}>
             <option value="all">All Categories</option>
             <option value="Explanation">💬 Explanation</option>
             <option value="Bug">🐛 Bug</option>
             <option value="Enhancement">✨ Enhancement</option>
             <option value="Customization">🔧 Customization</option>
           </select>
-          <select value={pendingFilter} onChange={(e) => { setPendingFilter(e.target.value); setPage(1); }}>
+          <select aria-label="Filter by pending owner" value={pendingFilter} onChange={(e) => { setPendingFilter(e.target.value); setPage(1); }}>
             <option value="all">All Pending To</option>
             <option value="Client">👤 Client</option>
             <option value="Jeonsoft">🏢 Jeonsoft</option>
             <option value="Client, Jeonsoft">👤🏢 Client, Jeonsoft</option>
             <option value="Jeonsoft, Client">🏢👤 Jeonsoft, Client</option>
           </select>
-          <select value={agingFilter} onChange={(e) => { setAgingFilter(e.target.value); setPage(1); }}>
+          <select aria-label="Filter by aging" value={agingFilter} onChange={(e) => { setAgingFilter(e.target.value); setPage(1); }}>
             <option value="all">All Aging</option>
             <option value="Today">Today</option>
             <option value="1-3 Days">1-3 Days</option>

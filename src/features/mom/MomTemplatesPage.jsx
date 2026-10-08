@@ -33,7 +33,7 @@ export default function MomTemplatesPage() {
   return (
     <section className="module">
       <div className="module-header">
-        <h3><i className="fas fa-file-alt"></i> MOM Templates</h3>
+        <div className="module-heading"><h3><i className="fas fa-file-alt"></i> MOM Templates</h3><p className="module-description">Prepare consistent meeting minutes with reusable templates.</p></div>
         {!isUsingDefault && (
           <div className="module-actions">
             <span 

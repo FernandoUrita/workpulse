@@ -1,3 +1,4 @@
+import { useModalDialog } from '../../hooks/useModalDialog.js';
 import { useState } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
 import { parseCSV, mapCSVToTicket } from '../../utils/csvHelpers.js';
@@ -7,8 +8,6 @@ export default function ImportModal({ show, taskType, existingTickets, onClose, 
   const [rawText, setRawText] = useState('');
   const [preview, setPreview] = useState([]);
   const [fileName, setFileName] = useState('');
-
-  if (!show) return null;
 
   const reset = () => {
     setRawText('');
@@ -20,6 +19,9 @@ export default function ImportModal({ show, taskType, existingTickets, onClose, 
     reset();
     onClose();
   };
+
+  const dialogProps = useModalDialog(show, handleClose);
+  if (!show) return null;
 
   const buildPreview = (text) => {
     try {
@@ -42,7 +44,7 @@ export default function ImportModal({ show, taskType, existingTickets, onClose, 
 
       setPreview(withStatus);
       return withStatus;
-    } catch (err) {
+    } catch {
       showToast('error', 'Parse Error', 'Could not parse the data.');
       return [];
     }
@@ -75,7 +77,7 @@ export default function ImportModal({ show, taskType, existingTickets, onClose, 
       return;
     }
 
-    const cleaned = valid.map(({ _isDuplicate, ...rest }) => rest);
+    const cleaned = valid.map(row => Object.fromEntries(Object.entries(row).filter(([key]) => key !== '_isDuplicate')));
     onImport(cleaned);
     showToast('success', 'Import Complete', `${cleaned.length} ticket(s) imported.`);
     reset();
@@ -87,7 +89,7 @@ export default function ImportModal({ show, taskType, existingTickets, onClose, 
 
   return (
     <div className="modal show import-modal" onClick={(e) => e.target === e.currentTarget && handleClose()}>
-      <div className="modal-content" style={{ maxWidth: '720px' }}>
+      <div {...dialogProps} className="modal-content" style={{ maxWidth: '720px' }}>
         <div className="modal-header">
           <h3>
             <i className="fas fa-file-import"></i>
@@ -96,7 +98,7 @@ export default function ImportModal({ show, taskType, existingTickets, onClose, 
               {taskType === 'support' ? 'Support Task' : 'Project Task'}
             </span>
           </h3>
-          <button className="close-modal" onClick={handleClose}>&times;</button>
+          <button className="close-modal" type="button" aria-label="Close dialog" onClick={handleClose}>&times;</button>
         </div>
 
         <div className="modal-body">

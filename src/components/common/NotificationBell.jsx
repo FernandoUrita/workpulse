@@ -1,3 +1,4 @@
+import { REMINDER_LEVELS, reminderLevel } from '../../utils/reminderLevels.js';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -5,11 +6,13 @@ import { useNotifications } from '../../context/NotificationContext.jsx';
 import SendNotificationModal from './SendNotificationModal.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { enablePush, disablePush } from '../../pwa/push.js';
+import { useNotificationExperience } from '../../context/NotificationExperience.jsx';
 import { formatDateTime } from '../../utils/helpers.js';
 
 export default function NotificationBell() {
   const {
     notifications,
+    realtimeStatus,
     error,
     loading,
     refetch,
@@ -21,6 +24,7 @@ export default function NotificationBell() {
     dismissAll,
   } = useNotifications();
   const { currentUser } = useAuth();
+  const { desktopEnabled, soundEnabled, setSound, toggleDesktop, testAlert, testDesktop, preferenceMessage } = useNotificationExperience();
   const [compose, setCompose] = useState(false);
   const [pushMessage, setPushMessage] = useState('');
   const [pushBusy, setPushBusy] = useState(false);
@@ -136,15 +140,24 @@ export default function NotificationBell() {
               )}
             </div>
 
-<<<<<<< HEAD
             <div style={{ padding: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {['head', 'admin'].includes(currentUser?.role) && <button type="button" className="btn" onClick={() => { setOpen(false); setCompose(true); }}>Send reminder</button>}
               <button type="button" className="btn" disabled={pushBusy} onClick={() => changePush(true)}>Enable browser push</button>
               <button type="button" className="btn" disabled={pushBusy} onClick={() => changePush(false)}>Disable push</button>
               {pushMessage && <p role="status">{pushMessage}</p>}
             </div>
-=======
->>>>>>> 7fa8eda8de3473a0d88b77a070408e58fdf66ccd
+            <div className="notif-preferences">
+              <button type="button" className="secondary-btn" aria-pressed={desktopEnabled} onClick={toggleDesktop}>
+                <i className="fas fa-desktop" aria-hidden="true"></i> {desktopEnabled ? 'Desktop alerts: On' : 'Enable desktop alerts'}
+              </button>
+              <button type="button" className="secondary-btn" aria-pressed={soundEnabled} onClick={() => setSound(!soundEnabled)}>
+                <i className={`fas ${soundEnabled ? 'fa-volume-up' : 'fa-volume-mute'}`} aria-hidden="true"></i> Sound: {soundEnabled ? 'On' : 'Off'}
+              </button>
+              <button type="button" className="secondary-btn" onClick={testAlert}>Test popup & sound</button>
+              <button type="button" className="secondary-btn" onClick={testDesktop}>Test desktop (5 seconds)</button>
+              <p>Live connection: {realtimeStatus}. Backup check: every 8 seconds.</p>
+              {preferenceMessage && <p role="status">{preferenceMessage}</p>}
+            </div>
             {error && (
               <div role="alert" style={{ padding: '12px', color: '#b91c1c' }}>
                 {error} <button type="button" onClick={refetch}>Retry</button>
@@ -163,7 +176,7 @@ export default function NotificationBell() {
                   return (
                     <div
                       key={n.id}
-                      className={`notif-item ${n.severity} ${isRead ? 'read' : 'unread'}`}
+                      className={`notif-item reminder-level-${reminderLevel(n)} ${n.severity} ${isRead ? 'read' : 'unread'}`}
                       onClick={() => handleNotificationClick(n)}
                       role="button"
                       tabIndex={0}
@@ -179,7 +192,7 @@ export default function NotificationBell() {
                       </div>
                       <div className="notif-item-content">
                         <div className="notif-item-title">{n.title}</div>
-                        <div className="notif-item-message">{n.message}</div>
+                        <div className="notif-reminder-label">{REMINDER_LEVELS[reminderLevel(n)].label}</div><div className="notif-item-message">{n.message}</div>
                         <div className="notif-item-time">
                           {formatDateTime(n.timestamp)}
                         </div>
