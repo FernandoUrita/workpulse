@@ -1,3 +1,4 @@
+import UrgentAttentionButton from '../../components/common/UrgentAttentionButton.jsx';
 import EmployeeReportModal from '../../components/common/EmployeeReportModal.jsx';
 import SendNotificationModal from '../../components/common/SendNotificationModal.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -282,7 +283,7 @@ export default function ReportsPage() {
                         <span className="activity-bar-label">{e.totalActivity}</span>
                       </div>
                     </td>
-                    {canSend && <td><button type="button" className="btn" title="Send notification" aria-label={`Send reminder to ${e.name || e.username}`} onClick={event => { event.stopPropagation(); setRecipient(e); }}><i className="fas fa-paper-plane" aria-hidden="true"></i></button></td>}
+                    {canSend && <td><div className="reports-reminder-actions"><UrgentAttentionButton employee={e} /><button type="button" className="btn" title="Send notification" aria-label={`Send reminder to ${e.name || e.username}`} onClick={event => { event.stopPropagation(); setRecipient(e); }}><i className="fas fa-paper-plane" aria-hidden="true"></i></button></div></td>}
                   </tr>
                 ))}
               </tbody>

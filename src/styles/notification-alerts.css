@@ -31,3 +31,16 @@
 .notif-reminder-label { font-size: 11px; font-weight: 600; color: var(--reminder-color); margin: 4px 0; }
 .reminder-preview { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 8px; }
 .reminder-preview > span { width: 12px; height: 12px; border-radius: 50%; background: var(--reminder-color); }
+
+/* Urgent alerts remain available until explicitly opened or closed. */
+.wp-alert-stack { max-height: 70dvh; overflow-y: auto; pointer-events: auto; overscroll-behavior: contain; }
+.wp-alert-card { flex-shrink: 0; }
+.urgent-attention-control { display: inline-flex; flex-direction: column; gap: 4px; max-width: 240px; }
+.urgent-attention-control small { font-size: 11px; color: var(--text-secondary); white-space: normal; }
+.urgent-attention-control small:empty { display: none; }
+.urgent-attention-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #b91c1c; color: #fff; border: 1px solid #b91c1c; border-radius: 8px; padding: 9px 12px; cursor: pointer; font: inherit; font-weight: 600; }
+.urgent-attention-btn:hover:not(:disabled) { background: #991b1b; }
+.urgent-attention-btn:focus-visible { outline: 3px solid #f87171; outline-offset: 3px; }
+.urgent-attention-btn:disabled { opacity: .6; cursor: not-allowed; }
+.reports-reminder-actions { display: flex; align-items: flex-start; gap: 8px; }
+.employee-report-footer { flex-wrap: wrap; align-items: center; }

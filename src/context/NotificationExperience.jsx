@@ -42,17 +42,17 @@ function SessionExperience({ userId, children }) {
       return audio.current.state === 'running';
     } catch { return false; }
   }, []);
-  const playChime = useCallback(() => {
+  const playChime = useCallback((urgent = false) => {
     const context = audio.current;
     if (!context || context.state !== 'running') return;
     const now = context.currentTime;
-    [660, 880].forEach((frequency, index) => {
+    (urgent ? [880, 1174, 880, 1174] : [660, 880]).forEach((frequency, index) => {
       const oscillator = context.createOscillator();
       const gain = context.createGain();
-      const start = now + index * 0.13;
-      oscillator.type = 'sine'; oscillator.frequency.value = frequency;
+      const start = now + index * (urgent ? 0.22 : 0.16);
+      oscillator.type = urgent ? 'triangle' : 'sine'; oscillator.frequency.value = frequency;
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.12, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(urgent ? 0.35 : 0.22, start + 0.015);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
       oscillator.connect(gain); gain.connect(context.destination);
       oscillator.start(start); oscillator.stop(start + 0.24);
@@ -98,7 +98,7 @@ function SessionExperience({ userId, children }) {
     if ((row.desktopTest || (!row.preview && !foreground)) && desktopEnabled && window.isSecureContext && 'Notification' in window && Notification.permission === 'granted') {
       try {
         const notice = new Notification(row.title || 'WorkPulse', {
-          body: row.message || '', tag: `workpulse-${row.id}`, silent: !soundEnabled,
+          body: row.message || '', tag: `workpulse-${row.id}`, silent: !soundEnabled, requireInteraction: reminderLevel(row) === 'urgent',
         });
         desktopNotices.current.add(notice);
         notice.onclick = () => { notice.close(); void openAlert(row); };
@@ -107,8 +107,12 @@ function SessionExperience({ userId, children }) {
         setPreferenceMessage(`Desktop notification could not display: ${err.message}. Check browser and Windows notification settings.`);
       }
     }
-    setPopups(prev => [...prev.filter(n => n.id !== row.id), row].slice(-3));
-    if (foreground && soundEnabled) playChime();
+    setPopups(prev => {
+      const next = [...prev.filter(n => n.id !== row.id), row];
+      const normalIds = new Set(next.filter(n => reminderLevel(n) !== 'urgent').slice(-3).map(n => n.id));
+      return next.filter(n => reminderLevel(n) === 'urgent' || normalIds.has(n.id));
+    });
+    if (foreground && soundEnabled) playChime(reminderLevel(row) === 'urgent');
   }, [desktopEnabled, soundEnabled, openAlert, playChime]);
 
   useEffect(() => {
@@ -188,10 +192,10 @@ function AlertCard({ row, onClose, onOpen }) {
     return () => document.removeEventListener('visibilitychange', changed);
   }, []);
   useEffect(() => {
-    if (paused || hidden) return;
+    if (paused || hidden || reminderLevel(row) === 'urgent') return;
     const timer = setTimeout(() => onClose(row.id), 6000);
     return () => clearTimeout(timer);
-  }, [row.id, onClose, paused, hidden]);
+  }, [row, onClose, paused, hidden]);
   return <article className={`wp-alert-card wp-alert-level-${reminderLevel(row)}`} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setPaused(false); }}>
     <span className="wp-alert-icon" aria-hidden="true"><i className="fas fa-bell"></i></span>
     <button className="wp-alert-open" type="button" onClick={() => onOpen(row)}><span className="wp-alert-label">WORKPULSE · {REMINDER_LEVELS[reminderLevel(row)].label}</span><strong>{row.title}</strong><span>{row.message}</span><small>{row.preview ? 'Test notification' : 'Click to open'}</small></button>
