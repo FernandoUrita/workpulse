@@ -1,3 +1,5 @@
+import ProjectReports from './ProjectReports.jsx';
+import '../../styles/projects.css';
 import UrgentAttentionButton from '../../components/common/UrgentAttentionButton.jsx';
 import EmployeeReportModal from '../../components/common/EmployeeReportModal.jsx';
 import SendNotificationModal from '../../components/common/SendNotificationModal.jsx';
@@ -29,6 +31,7 @@ export default function ReportsPage() {
   const [recipient, setRecipient] = useState(null);
   const [reportNow, setReportNow] = useState(() => Date.now());
   const [dateRange, setDateRange] = useState('all');
+  const [reportTab,setReportTab]=useState('employees');
 
   const [filteredTasks, filteredTickets, filteredMeetings, filteredItems] = useMemo(() => {
     const cutoff = reportNow - (RANGE_MS[dateRange] || 0);
@@ -115,6 +118,8 @@ export default function ReportsPage() {
     showToast('success', 'Export Complete', `${employeeStats.length} employee(s) exported.`);
   };
 
+  if (reportTab==='projects' && canSend) return <section className="module"><div className="module-header"><h3>Reports</h3></div><div className="reports-filters"><button className="reports-filter-chip" onClick={()=>setReportTab('employees')}>Employee reports</button><button className="reports-filter-chip active" aria-pressed="true">Project reports</button></div><ProjectReports/></section>;
+
   if (loading) {
     return (
       <section className="module">
@@ -157,6 +162,7 @@ export default function ReportsPage() {
         </div>
       </div>
 
+      {canSend&&<div className="reports-filters"><button className="reports-filter-chip active" aria-pressed="true">Employee reports</button><button className="reports-filter-chip" onClick={()=>setReportTab('projects')}>Project reports</button></div>}
       <div className="reports-filters">
         {DATE_RANGES.map(r => (
           <button

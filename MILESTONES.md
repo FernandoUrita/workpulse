@@ -38,3 +38,9 @@ October 9: Projects Activity integration delivered; current source includes comp
 
 ## Daily dashboard reference update
 Delivered: greeting, daily cards, attention queue, schedule, recent records and collapsible clickable charts. Build and scoped lint validated; browser and production data checks remain.
+
+## Projects Reports
+Delivered: Head/Admin report tab, active project progress, overdue deployment and pending approval drilldowns, Group POC workload, searchable pagination and CSV export. Uses existing RLS reads. Live role verification remains pending.
+
+## Monitoring freshness and remarks trail
+Delivered: red/green left border based on Philippine reporting day, automatic remarks trail trigger, author/timestamp and before/after history. SQL migration must be applied and verified in Supabase.
