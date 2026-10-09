@@ -264,14 +264,7 @@ export default function TasksPage() {
         onChange={(next) => { setDateNav(next); setPage(1); setSelected(new Set()); }}
       />
 
-      <div className="active-date-label">
-        <i className="fas fa-calendar-check"></i>
-        <span>{dateLabel}</span>
-        <span className="active-date-count">
-          {stats.total} task{stats.total !== 1 ? 's' : ''}
-        </span>
-      </div>
-
+      <p className="task-date-scope">{dateLabel}</p>
       <div className="task-stats-grid">
         <div className="task-stat-card total">
           <div className="task-stat-icon blue"><i className="fas fa-list-check"></i></div>
@@ -308,20 +301,6 @@ export default function TasksPage() {
           <h4>Progress <span>{stats.percent}%</span></h4>
           <div className="task-progress-bar">
             <div className="task-progress-fill" style={{ width: `${stats.percent}%` }}></div>
-          </div>
-        </div>
-        <div className="task-progress-stats">
-          <div className="task-progress-stat">
-            <span className="dot completed"></span>
-            <span>Done: <strong>{stats.completed}</strong></span>
-          </div>
-          <div className="task-progress-stat">
-            <span className="dot pending"></span>
-            <span>Pending: <strong>{stats.pending}</strong></span>
-          </div>
-          <div className="task-progress-stat">
-            <span className="dot overdue"></span>
-            <span>Overdue: <strong>{stats.overdue}</strong></span>
           </div>
         </div>
       </div>
@@ -423,9 +402,6 @@ export default function TasksPage() {
 
           {!search && filter === 'all' && (
             <div className="empty-suggestions">
-              <button className="suggestion-chip" onClick={handleAdd}>
-                <i className="fas fa-plus"></i> Create a Task
-              </button>
               <button 
                 className="suggestion-chip" 
                 onClick={() => { setDateNav({ mode: 'tomorrow', activeDate: dateNav.activeDate }); setPage(1); }}

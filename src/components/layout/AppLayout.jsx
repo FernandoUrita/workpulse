@@ -11,6 +11,8 @@ import { useAppData } from '../../context/AppDataContext.jsx';
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarMinimized, setSidebarMinimized] = useState(() => { try { return localStorage.getItem('workpulse:sidebar-minimized') === 'true'; } catch { return false; } });
+  const minimizeSidebar = () => setSidebarMinimized(previous => { const next = !previous; try { localStorage.setItem('workpulse:sidebar-minimized', String(next)); } catch { /* Session preference remains available. */ } return next; });
   const location = useLocation();
   const { loading } = useAppData();
   const { open: paletteOpen, setOpen: setPaletteOpen } = useCommandPalette();
@@ -19,8 +21,8 @@ export default function AppLayout() {
   const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="app-container">
-      <Sidebar isOpen={sidebarOpen} onToggle={closeSidebar} />
+    <div className={`app-container ${sidebarMinimized ? 'sidebar-minimized' : ''}`}>
+      <Sidebar isOpen={sidebarOpen} onToggle={closeSidebar} minimized={sidebarMinimized} onMinimize={minimizeSidebar} />
 
       {sidebarOpen && (
         <div
@@ -41,7 +43,7 @@ export default function AppLayout() {
           onMenuClick={toggleSidebar}
           onOpenCommandPalette={() => setPaletteOpen(true)}
         />
-        <PwaControls />
+        <PwaControls showInstall={location.pathname === '/settings'} />
         <PageTransition routeKey={location.pathname}>
           <Suspense fallback={<PageSkeleton />}>
             {loading ? <PageSkeleton /> : <Outlet />}

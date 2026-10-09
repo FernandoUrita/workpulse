@@ -1,0 +1,1 @@
+Copy the patch src folder contents into your existing src and replace matching files. No SQL changes. Priority may be missing or blank in CSV; it defaults to Medium and can be changed in Edit Row after import. Other CSV validation remains unchanged. Run npm run build and refresh. Build, targeted lint and six CSV tests passed.

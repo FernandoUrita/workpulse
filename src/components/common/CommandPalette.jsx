@@ -5,6 +5,7 @@ import { useAppData } from '../../context/AppDataContext.jsx';
 import { useTheme } from '../../context/ThemeContext.jsx';
 
 const NAV_ITEMS = [
+  { id: 'nav-projects', group: 'Navigation', label: 'Go to Projects', icon: 'fa-project-diagram', path: '/projects' },
   { id: 'nav-dashboard', group: 'Navigation', label: 'Go to Dashboard', icon: 'fa-th-large', path: '/dashboard' },
   { id: 'nav-tasks', group: 'Navigation', label: 'Go to Tasks', icon: 'fa-tasks', path: '/tasks' },
   { id: 'nav-meetings', group: 'Navigation', label: 'Go to Meetings', icon: 'fa-calendar-alt', path: '/meetings' },

@@ -55,12 +55,12 @@ export default function MomTemplatesPage() {
         )}
       </div>
 
-      <div className="template-hints">
-        <strong>💡 How it works</strong>
+      <details className="template-hints"><summary>How templates work</summary>
+        
         This template is used when you click <strong>"End Meeting & MOM"</strong> on any meeting. 
         The <code>{'{title}'}</code>, <code>{'{date}'}</code>, <code>{'{attendees}'}</code>, 
         and other placeholders will be automatically replaced with actual meeting data.
-      </div>
+      </details>
 
       <div className="template-management">
         <div className="template-actions">

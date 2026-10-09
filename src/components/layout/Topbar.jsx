@@ -1,19 +1,6 @@
 import ThemeToggle from '../common/ThemeToggle.jsx';
 import NotificationBell from '../common/NotificationBell.jsx';
 
-const PAGE_TITLES = {
-  '/dashboard': 'Dashboard',
-  '/tasks': 'Task Management',
-  '/meetings': 'Meeting Management',
-  '/items': 'Items Management',
-  '/mom': 'MOM Templates',
-  '/settings': 'Settings',
-  '/tickets': 'Tickets',
-  '/reports': 'Team Reports',
-  '/users': 'Users & Access',
-  '/activity': 'Activity',
-};
-
 export default function Topbar({ currentPath, onMenuClick, onOpenCommandPalette }) {
   const today = new Date().toLocaleDateString('en-PH', {
     weekday: 'short',
@@ -22,7 +9,7 @@ export default function Topbar({ currentPath, onMenuClick, onOpenCommandPalette 
     year: 'numeric',
   });
 
-  const title = PAGE_TITLES[currentPath] || 'Dashboard';
+  const title = currentPath.startsWith('/projects')?'Projects':(['/tasks','/tickets','/items'].includes(currentPath)?'Support':['/meetings','/mom'].includes(currentPath)?'Coordination':['/reports','/users'].includes(currentPath)?'Management':'Workspace');
 
   return (
     <header className="topbar">

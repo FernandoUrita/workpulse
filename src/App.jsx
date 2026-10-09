@@ -7,6 +7,8 @@ import LoginPage from './components/auth/LoginPage.jsx';
 import RegisterPage from './components/auth/RegisterPage.jsx';
 import RoleGuard from './components/auth/RoleGuard.jsx';
 
+const ProjectMonitoringPage = lazy(() => import('./features/projects/ProjectMonitoringPage.jsx'));
+const ProjectsPage = lazy(() => import('./features/projects/ProjectsPage.jsx'));
 const UsersPage = lazy(() => import('./features/admin/UsersPage.jsx'));
 const ReportsPage = lazy(() => import('./features/reports/ReportsPage.jsx'));
 const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage.jsx'));
@@ -99,6 +101,8 @@ export default function App() {
           }
         >
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/monitoring" element={<ProjectMonitoringPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/meetings" element={<MeetingsPage />} />
           <Route path="/items" element={<ItemsPage />} />

@@ -1,0 +1,3 @@
+Copy the src files into your current project and replace matching files. Run npm run build then npm run dev. No SQL/dependencies required.
+
+Bell now contains notifications, mark-all-read, clear-all and error retry only. Sound, desktop permission, browser push, test buttons and Head/Admin send reminder moved to Settings > Notifications. Reports reminder controls remain. Existing preference handlers and push functions are reused. Connection/debug text removed from the bell. Push delivery still requires your existing server/VAPID setup. Build and changed-file lint passed; live delivery and browser checks not performed here.

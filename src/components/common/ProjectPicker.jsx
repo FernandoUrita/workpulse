@@ -1,0 +1,13 @@
+import { useState } from 'react';
+import { useModalDialog } from '../../hooks/useModalDialog.js';
+import '../../styles/project-picker.css';
+export default function ProjectPicker({projects,selected,onChange}) {
+ const [open,setOpen]=useState(false);
+ return <div className="project-picker"><span className="project-picker-label">Project workspace</span><button type="button" className="project-picker-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)}><i className="fas fa-folder-open" aria-hidden="true"/><span>{selected?.name||'Choose a Project'}</span><i className="fas fa-chevron-down" aria-hidden="true"/></button>{open&&<PickerDialog projects={projects} selected={selected} onClose={()=>setOpen(false)} onSelect={id=>{onChange(id);setOpen(false);}}/>}</div>;
+}
+function PickerDialog({projects,selected,onClose,onSelect}) {
+ const [query,setQuery]=useState(''),[page,setPage]=useState(1);const modal=useModalDialog(true,onClose);
+ const filtered=projects.filter(g=>[g.name,g.client_name,g.tier].some(v=>String(v||'').toLowerCase().includes(query.toLowerCase())));
+ const pages=Math.max(1,Math.ceil(filtered.length/10));
+ return <div className="projects-backdrop" onClick={e=>{if(e.target===e.currentTarget)onClose();}}><div className="projects-dialog project-picker-dialog" {...modal}><div className="modal-header"><div><h3>Switch Project</h3><p>{projects.length} accessible workspaces</p></div><button type="button" className="close-modal" aria-label="Close Project picker" onClick={onClose}>×</button></div><div className="project-picker-content"><label className="project-picker-search">Search Projects<input autoFocus type="search" value={query} onChange={e=>{setQuery(e.target.value);setPage(1);}} placeholder="Project name, client or tier…"/></label><div className="project-picker-results">{filtered.slice((page-1)*10,page*10).map(g=><button type="button" key={g.id} className={`project-picker-option ${g.id===selected?.id?'selected':''}`} aria-pressed={g.id===selected?.id} onClick={()=>onSelect(g.id)}><div><strong>{g.name}</strong><span>{g.client_name||g.name}{g.archived?' · Archived':''}</span></div><span className={`project-tier tier-${(g.tier||'Standard').toLowerCase()}`}>{g.tier||'Standard'}</span>{g.id===selected?.id&&<i className="fas fa-check" aria-hidden="true"/>}</button>)}{!filtered.length&&<p>No matching Projects.</p>}</div><div className="projects-pagination"><span>{filtered.length} results · {page}/{pages}</span><button type="button" className="secondary-btn" disabled={page===1} onClick={()=>setPage(page-1)}>Previous</button><button type="button" className="secondary-btn" disabled={page===pages} onClick={()=>setPage(page+1)}>Next</button></div></div></div></div>;
+}

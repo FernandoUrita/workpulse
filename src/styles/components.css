@@ -6190,3 +6190,10 @@
     flex-direction: column;
   }
 }
+
+/* Keep overview totals balanced and reduce repeated visual chrome. */
+.dashboard-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }.task-date-scope { color:var(--text-secondary);font-size:12px;margin:12px 0; }.task-progress-section { padding:14px 18px; }.task-progress-info { width:100%; }.template-hints summary { cursor:pointer;font-weight:600; }.template-hints[open] summary { margin-bottom:12px; }
+@media(max-width:1100px) { .dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:550px) { .dashboard-grid { grid-template-columns:1fr; } }
+
+.notification-settings .settings-item { margin:20px 0;padding-bottom:18px;border-bottom:1px solid var(--border); }.notification-settings .settings-item>p { color:var(--text-secondary);font-size:12px;line-height:1.6;margin:8px 0 12px; }.notification-settings-tests summary { cursor:pointer;color:var(--text-secondary);font-size:12px;margin-bottom:12px; }.notification-settings .settings-actions { display:flex;gap:8px;flex-wrap:wrap;margin-top:14px; }

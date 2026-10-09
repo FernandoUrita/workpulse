@@ -3,16 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNotifications } from '../../context/NotificationContext.jsx';
-import SendNotificationModal from './SendNotificationModal.jsx';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { enablePush, disablePush } from '../../pwa/push.js';
-import { useNotificationExperience } from '../../context/NotificationExperience.jsx';
 import { formatDateTime } from '../../utils/helpers.js';
 
 export default function NotificationBell() {
   const {
     notifications,
-    realtimeStatus,
     error,
     loading,
     refetch,
@@ -23,19 +18,6 @@ export default function NotificationBell() {
     dismiss,
     dismissAll,
   } = useNotifications();
-  const { currentUser } = useAuth();
-  const { desktopEnabled, soundEnabled, setSound, toggleDesktop, testAlert, testDesktop, preferenceMessage } = useNotificationExperience();
-  const [compose, setCompose] = useState(false);
-  const [pushMessage, setPushMessage] = useState('');
-  const [pushBusy, setPushBusy] = useState(false);
-  const changePush = async enabled => {
-    setPushBusy(true);
-    try {
-      await (enabled ? enablePush(currentUser.id) : disablePush(currentUser.id));
-      setPushMessage(enabled ? 'Browser push enabled on this device.' : 'Browser push disabled on this device.');
-    } catch (err) { setPushMessage(err.message); }
-    finally { setPushBusy(false); }
-  };
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const panelRef = useRef(null);
@@ -86,6 +68,8 @@ export default function NotificationBell() {
         onClick={() => setOpen(prev => !prev)}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         title="Notifications"
+        aria-expanded={open}
+        aria-controls="notification-panel"
       >
         <i className="fas fa-bell"></i>
         {unreadCount > 0 && (
@@ -105,6 +89,7 @@ export default function NotificationBell() {
           <motion.div
             ref={panelRef}
             className="notif-panel"
+            id="notification-panel"
             initial={{ opacity: 0, y: -8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
@@ -140,24 +125,6 @@ export default function NotificationBell() {
               )}
             </div>
 
-            <div style={{ padding: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              {['head', 'admin'].includes(currentUser?.role) && <button type="button" className="btn" onClick={() => { setOpen(false); setCompose(true); }}>Send reminder</button>}
-              <button type="button" className="btn" disabled={pushBusy} onClick={() => changePush(true)}>Enable browser push</button>
-              <button type="button" className="btn" disabled={pushBusy} onClick={() => changePush(false)}>Disable push</button>
-              {pushMessage && <p role="status">{pushMessage}</p>}
-            </div>
-            <div className="notif-preferences">
-              <button type="button" className="secondary-btn" aria-pressed={desktopEnabled} onClick={toggleDesktop}>
-                <i className="fas fa-desktop" aria-hidden="true"></i> {desktopEnabled ? 'Desktop alerts: On' : 'Enable desktop alerts'}
-              </button>
-              <button type="button" className="secondary-btn" aria-pressed={soundEnabled} onClick={() => setSound(!soundEnabled)}>
-                <i className={`fas ${soundEnabled ? 'fa-volume-up' : 'fa-volume-mute'}`} aria-hidden="true"></i> Sound: {soundEnabled ? 'On' : 'Off'}
-              </button>
-              <button type="button" className="secondary-btn" onClick={testAlert}>Test popup & sound</button>
-              <button type="button" className="secondary-btn" onClick={testDesktop}>Test desktop (5 seconds)</button>
-              <p>Live connection: {realtimeStatus}. Backup check: every 8 seconds.</p>
-              {preferenceMessage && <p role="status">{preferenceMessage}</p>}
-            </div>
             {error && (
               <div role="alert" style={{ padding: '12px', color: '#b91c1c' }}>
                 {error} <button type="button" onClick={refetch}>Retry</button>
@@ -216,7 +183,7 @@ export default function NotificationBell() {
         )}
       </AnimatePresence>
     </div>
-    {compose && <SendNotificationModal onClose={() => setCompose(false)} />}
+
     </>
   );
 }

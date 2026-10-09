@@ -1,15 +1,16 @@
 import { useSyncExternalStore } from 'react';
 import { subscribePwa, getPwaSnapshot, installApp, applyUpdate, retryOfflineSetup } from '../../pwa/client.js';
 
-export default function PwaControls() {
+export default function PwaControls({ showInstall = false }) {
   const state = useSyncExternalStore(subscribePwa, getPwaSnapshot, getPwaSnapshot);
+  if (!showInstall && state.online && !state.updateAvailable && !state.error) return null;
   return (
     <div className="pwa-controls">
-      <div className="pwa-toolbar">
+      {(showInstall || !state.online) && <div className="pwa-toolbar">
         <span className={`pwa-status ${state.online ? '' : 'is-offline'}`} role="status">
           {!state.online ? 'Offline · changes stay on this device' : state.ready ? 'Ready for offline use' : 'Online'}
         </span>
-        {!state.installed && (state.canInstall ? (
+        {showInstall && !state.installed && (state.canInstall ? (
           <button className="secondary-btn" type="button" onClick={installApp}>Install WorkPulse</button>
         ) : (
           <details className="pwa-install-help">
@@ -17,7 +18,7 @@ export default function PwaControls() {
             <p>Open your browser menu and look for <strong>Install app</strong> or <strong>Add to Home Screen</strong>. On iPhone or iPad, use Safari’s Share menu, then Add to Home Screen. Availability depends on your browser.</p>
           </details>
         ))}
-      </div>
+      </div>}
       {state.updateAvailable && (
         <div className="pwa-notice" role="status">
           <p><strong>A new version is ready.</strong> Save any open forms before updating.</p>

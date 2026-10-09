@@ -1,236 +1,42 @@
-import { useMemo } from 'react';
-import { useAppData } from '../../context/AppDataContext.jsx';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { escapeHtml } from '../../utils/helpers.js';
+import { useAppData } from '../../context/AppDataContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useModalDialog } from '../../hooks/useModalDialog.js';
+import { isOverdue } from '../../utils/helpers.js';
+import '../../styles/projects.css';
+import '../../styles/dashboard-interactive.css';
 
-export default function DashboardPage() {
-  const { tasks, meetings, items, tickets } = useAppData();
-
-  const completed = tasks.filter(t => t.done).length;
-
-  // Ticket stats
-  const ticketStats = useMemo(() => {
-    const all = tickets || [];
-    return {
-      total: all.length,
-      open: all.filter(t => t.status === 'Open').length,
-      inProgress: all.filter(t => t.status === 'In Progress').length,
-      hypercare: all.filter(t => t.status === 'Hypercare').length,
-      closed: all.filter(t => t.status === 'Closed').length,
-    };
-  }, [tickets]);
-
-  const totalTasks = tasks.length;
-  const pending = totalTasks - completed;
-  const percentage = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
-
-  // Progress ring math
-  const radius = 50;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
-
-  // Upcoming meetings (not completed, future date)
-  const upcomingMeetings = meetings
-    .filter(m => {
-      if (m.completed) return false;
-      if (!m.date) return false;
-      const meetingDate = new Date(`${m.date}T${m.time || '00:00'}`);
-      return meetingDate > new Date();
-    })
-    .sort((a, b) => {
-      const dateA = new Date(`${a.date}T${a.time || '00:00'}`);
-      const dateB = new Date(`${b.date}T${b.time || '00:00'}`);
-      return dateA - dateB;
-    })
-    .slice(0, 5);
-
-  // Recent activities
-  const activities = [];
-  
-  [...tasks].reverse().slice(0, 5).forEach(t => {
-    activities.push({
-      id: `task-${t.id}`,
-      type: 'task',
-      icon: 'fa-tasks',
-      text: `Added task: "${t.text}"`,
-      timestamp: t.createdAt,
-    });
-  });
-
-  [...meetings].reverse().slice(0, 5).forEach(m => {
-    activities.push({
-      id: `meeting-${m.id}`,
-      type: 'meeting',
-      icon: 'fa-calendar-alt',
-      text: `Scheduled meeting: "${m.title}"`,
-      timestamp: m.createdAt,
-    });
-  });
-
-  [...items].reverse().slice(0, 5).forEach(i => {
-    activities.push({
-      id: `item-${i.id}`,
-      type: 'item',
-      icon: 'fa-box',
-      text: `Added item: "${i.text}"`,
-      timestamp: i.createdAt,
-    });
-  });
-
-  const recentActivities = activities
-    .filter(a => a.timestamp)
-    .sort((a, b) => b.timestamp - a.timestamp)
-    .slice(0, 8);
-
-  return (
-    <section className="module"><div className="module-header"><div className="module-heading"><h3>Your workspace at a glance</h3><p className="module-description">Review your workload and see what needs attention next.</p></div></div>
-      {/* ─── STAT CARDS ──────────────────────── */}
-      <div className="dashboard-grid">
-        <div className="stat-card">
-          <div className="stat-icon blue"><i className="fas fa-tasks"></i></div>
-          <div className="stat-info">
-            <h3>{totalTasks}</h3>
-            <p>Total Tasks</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon green"><i className="fas fa-calendar-check"></i></div>
-          <div className="stat-info">
-            <h3>{meetings.length}</h3>
-            <p>Meetings</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon purple"><i className="fas fa-box"></i></div>
-          <div className="stat-info">
-            <h3>{items.length}</h3>
-            <p>Items</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon orange"><i className="fas fa-check-circle"></i></div>
-          <div className="stat-info">
-            <h3>{completed}</h3>
-            <p>Completed Tasks</p>
-          </div>
-        </div>
-
-        {/* ─── TICKET STATS ─── */}
-        <Link to="/tickets" className="stat-card stat-card-link">
-          <div className="stat-icon blue"><i className="fas fa-ticket-alt"></i></div>
-          <div className="stat-info">
-            <h3>{ticketStats.total}</h3>
-            <p>Total Tickets</p>
-          </div>
-        </Link>
-        <Link to="/tickets" className="stat-card stat-card-link">
-          <div className="stat-icon green"><i className="fas fa-folder-open"></i></div>
-          <div className="stat-info">
-            <h3>{ticketStats.open}</h3>
-            <p>Open Tickets</p>
-          </div>
-        </Link>
-        <Link to="/tickets" className="stat-card stat-card-link">
-          <div className="stat-icon purple"><i className="fas fa-spinner"></i></div>
-          <div className="stat-info">
-            <h3>{ticketStats.inProgress}</h3>
-            <p>In Progress</p>
-          </div>
-        </Link>
-        <Link to="/tickets" className="stat-card stat-card-link">
-          <div className="stat-icon orange"><i className="fas fa-fire"></i></div>
-          <div className="stat-info">
-            <h3>{ticketStats.hypercare}</h3>
-            <p>Hypercare</p>
-          </div>
-        </Link>
-      </div>
-
-      {/* ─── CHARTS ROW ──────────────────────── */}
-      <div className="charts-row">
-        {/* Progress Ring */}
-        <div className="chart-card">
-          <h4><i className="fas fa-chart-pie"></i> Task Progress</h4>
-          <div className="progress-ring">
-            <div className="ring-container">
-              <svg viewBox="0 0 120 120" className="ring-svg">
-                <circle cx="60" cy="60" r={radius} className="ring-bg" />
-                <circle
-                  cx="60"
-                  cy="60"
-                  r={radius}
-                  className="ring-progress"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={offset}
-                />
-              </svg>
-              <div className="ring-label">
-                <span>{percentage}%</span>
-                <small>Complete</small>
-              </div>
-            </div>
-          </div>
-          <div className="progress-stats">
-            <div className="progress-stat">
-              <span className="dot done"></span>
-              <span>Done: <strong>{completed}</strong></span>
-            </div>
-            <div className="progress-stat">
-              <span className="dot pending"></span>
-              <span>Pending: <strong>{pending}</strong></span>
-            </div>
-          </div>
-        </div>
-
-        {/* Upcoming Meetings */}
-        <div className="chart-card">
-          <h4><i className="fas fa-calendar-week"></i> Upcoming Meetings</h4>
-          <div className="upcoming-meetings-list">
-            {upcomingMeetings.length === 0 ? (
-              <div className="dashboard-empty"><i className="fas fa-calendar-plus" aria-hidden="true" /><p>Your calendar is clear.</p><Link className="primary-btn" to="/meetings">Plan a meeting</Link></div>
-            ) : (
-              upcomingMeetings.map(m => (
-                <div key={m.id} className="upcoming-meeting-item">
-                  <div className="meeting-info">
-                    <span className="title">{escapeHtml(m.title)}</span>
-                    <span className="meta">
-                      {m.date} {m.time || ''} • {m.attendees?.length || 0} attendees
-                    </span>
-                  </div>
-                  <span className="meeting-time">{m.time || 'TBD'}</span>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ─── RECENT ACTIVITY ─────────────────── */}
-      <div className="recent-activity">
-        <h4><i className="fas fa-clock"></i> Recent Activity</h4>
-        {recentActivities.length === 0 ? (
-          <div className="dashboard-empty"><i className="fas fa-clipboard-list" aria-hidden="true" /><p>Your work starts here. Add a task to begin tracking your progress.</p><Link className="primary-btn" to="/tasks">Go to tasks</Link></div>
-        ) : (
-          recentActivities.map(a => (
-            <div key={a.id} className="activity-item">
-              <div className={`activity-icon ${a.type}`}>
-                <i className={`fas ${a.icon}`}></i>
-              </div>
-              <div className="activity-content">
-                <div className="text">{escapeHtml(a.text)}</div>
-                <div className="time">
-                  {new Date(a.timestamp).toLocaleDateString('en-PH', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </section>
-  );
+const localDay=date=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+const dateText=value=>value&&!Number.isNaN(new Date(value).getTime())?new Date(value).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'No date';
+export default function DashboardPage(){
+ const {tasks,meetings,items,tickets=[]}=useAppData();const {currentUser}=useAuth();const [dialog,setDialog]=useState(null);
+ const now=new Date(),today=localDay(now);
+ const records=[...tasks.map(r=>({key:`task-${r.id}`,id:r.id,title:r.text,type:'Task',status:r.done?'Completed':'Pending',created:r.createdAt,date:r.dueDate,path:'/tasks',source:r})),...tickets.map(r=>({key:`ticket-${r.id}`,id:r.id,title:r.subject||r.ticketNo,type:'Ticket',status:r.status||'Unknown',created:r.createdAt,date:r.createdAt,path:'/tickets',source:r})),...items.map(r=>({key:`item-${r.id}`,id:r.id,title:r.text,type:'Support item',status:r.status||'pending',created:r.createdAt,date:r.nextCheck||r.targetDate||r.endDate,path:'/items',source:r})),...meetings.map(r=>({key:`meeting-${r.id}`,id:r.id,title:r.title,type:'Meeting',status:r.completed?'Completed':'Scheduled',created:r.createdAt,date:r.date,path:'/meetings',source:r}))];
+ const active=records.filter(r=>r.type==='Task'?!r.source.done:r.type==='Meeting'?!r.source.completed:!['Closed','completed','cancelled'].includes(r.status));
+ const overdue=records.filter(r=>r.type==='Task'&&!r.source.done&&isOverdue(r.source.dueDate));
+ const followups=records.filter(r=>r.type==='Support item'&&!['completed','cancelled'].includes(r.status)&&r.source.nextCheck&&r.source.nextCheck<=today);
+ const upcoming=records.filter(r=>r.type==='Meeting'&&!r.source.completed&&r.source.date&&new Date(`${r.source.date}T${r.source.time||'23:59'}`)>=now).sort((a,b)=>a.date.localeCompare(b.date));
+ const completed=records.filter(r=>r.type==='Task'&&r.source.done);const percent=tasks.length?Math.round(completed.length/tasks.length*100):0;
+ const workload=['Task','Ticket','Support item','Meeting'].map((type,index)=>({label:type,color:['#3b82f6','#8b5cf6','#14b8a6','#f59e0b'][index],rows:active.filter(r=>r.type===type)}));
+ const ticketStates=[...new Set(tickets.map(r=>r.status||'Unknown'))].map((status,index)=>({label:status,color:['#3b82f6','#f59e0b','#14b8a6','#8b5cf6','#f97316'][index%5],rows:records.filter(r=>r.type==='Ticket'&&r.status===status)}));
+ const days=Array.from({length:7},(_,index)=>{const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()-6+index);const key=localDay(day);return {label:day.toLocaleDateString(undefined,{weekday:'short'}),key,rows:records.filter(r=>r.created&&!Number.isNaN(new Date(r.created).getTime())&&localDay(new Date(r.created))===key)};});
+ const recent=records.filter(r=>r.created&&!Number.isNaN(new Date(r.created).getTime())).sort((a,b)=>new Date(b.created)-new Date(a.created)).slice(0,6);
+ const show=(title,rows)=>setDialog({title,rows});
+ return <section className="module pulse-dashboard">
+ <header className="pulse-hero"><div><span className="pulse-eyebrow">YOUR DAILY WORKSPACE</span><h2>Hello, {currentUser?.name||'there'} <span aria-hidden="true">✦</span></h2><p>{overdue.length?`${overdue.length} overdue task${overdue.length===1?'':'s'} need attention.`:'Let’s keep your work moving.'} Review progress and open any chart for details.</p></div><div className="pulse-quick"><Link className="primary-btn" to="/tasks">Tasks <i className="fas fa-arrow-right" aria-hidden="true"/></Link><Link className="secondary-btn" to="/tickets">Tickets</Link></div></header>
+ <div className="pulse-kpis">{[['Active workload',active,'layer-group','blue'],['Completed tasks',completed,'check-circle','green'],['Needs attention',[...overdue,...followups],'bell','orange'],['Upcoming meetings',upcoming,'calendar-alt','purple']].map(([label,rows,icon,color])=><button type="button" key={label} className={`pulse-kpi kpi-${color}`} onClick={()=>show(label,rows)}><i className={`fas fa-${icon}`} aria-hidden="true"/><strong>{rows.length}</strong><span>{label}</span><small>View details ↗</small></button>)}</div>
+ <div className="pulse-chart-grid"><article className="pulse-panel"><header><div><h3>Workload by module</h3><p>Current active records</p></div><span className="pulse-tag">{active.length} active</span></header><Bars groups={workload} onSelect={show}/></article>
+ <article className="pulse-panel pulse-completion"><header><div><h3>Task completion</h3><p>Current task snapshot</p></div></header><button className="pulse-ring-button" type="button" onClick={()=>show('All tasks',records.filter(r=>r.type==='Task'))} aria-label={`Task completion ${percent} percent; view all tasks`}><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="48" fill="none" stroke="var(--border)" strokeWidth="10"/><circle cx="60" cy="60" r="48" fill="none" stroke="#14b8a6" strokeWidth="10" strokeLinecap="round" strokeDasharray="301.59" strokeDashoffset={301.59*(1-percent/100)} transform="rotate(-90 60 60)"/></svg><span><strong>{percent}%</strong><small>{tasks.length?'complete':'No tasks yet'}</small></span></button><div className="pulse-ring-legend"><button onClick={()=>show('Completed tasks',completed)}>● {completed.length} completed</button><button onClick={()=>show('Pending tasks',records.filter(r=>r.type==='Task'&&!r.source.done))}>● {tasks.length-completed.length} pending</button></div></article>
+ <article className="pulse-panel"><header><div><h3>Incoming work</h3><p>Records created over the last 7 days</p></div><span className="pulse-tag">{days.reduce((n,d)=>n+d.rows.length,0)} added</span></header><div className="pulse-week-chart">{days.map(day=><button type="button" key={day.key} onClick={()=>show(`Created ${day.key}`,day.rows)} aria-label={`${day.key}: ${day.rows.length} records`}><strong>{day.rows.length}</strong><div className="pulse-column-track"><span style={{height:`${day.rows.length/Math.max(1,...days.map(d=>d.rows.length))*100}%`}}/></div><small>{day.label}</small></button>)}</div><small className="pulse-muted">Based on recorded creation dates, not completion history.</small></article>
+ <article className="pulse-panel"><header><div><h3>Ticket pipeline</h3><p>All current ticket statuses</p></div><span className="pulse-tag">{tickets.length} tickets</span></header>{ticketStates.length?<Bars groups={ticketStates} onSelect={(label,rows)=>show(`${label} tickets`,rows)}/>:<div className="pulse-empty"><i className="fas fa-ticket-alt" aria-hidden="true"/><p>No tickets recorded yet.</p><Link to="/tickets">Open Tickets →</Link></div>}</article></div>
+ <div className="pulse-bottom-grid"><article className="pulse-panel"><header><div><h3>Attention queue</h3><p>Start with these next actions</p></div></header>{[['Overdue tasks',overdue,'clock'],['Support follow-ups due',followups,'bell'],['Upcoming meetings',upcoming,'calendar-alt']].map(([label,rows,icon])=><button type="button" className="pulse-attention" key={label} onClick={()=>show(label,rows)}><i className={`fas fa-${icon}`} aria-hidden="true"/><span>{label}<small>{rows[0]?.title||'Nothing waiting here'}</small></span><strong>{rows.length}</strong><i className="fas fa-chevron-right" aria-hidden="true"/></button>)}</article><article className="pulse-panel"><header><div><h3>Recently added</h3><p>Latest records across your modules</p></div><Link to="/activity">Activity →</Link></header>{recent.length?recent.map(r=><button type="button" key={r.key} className="pulse-recent" onClick={()=>show(r.title,[r])}><span className="pulse-record-icon"><i className={`fas ${r.type==='Task'?'fa-tasks':r.type==='Ticket'?'fa-ticket-alt':r.type==='Meeting'?'fa-calendar-alt':'fa-box'}`} aria-hidden="true"/></span><span><strong>{r.title}</strong><small>{r.type} · {dateText(r.created)}</small></span><i className="fas fa-arrow-right" aria-hidden="true"/></button>):<p className="pulse-empty">No recent records. Your activity will appear here.</p>}</article></div>
+ {dialog&&<DashboardDialog key={dialog.title} dialog={dialog} onClose={()=>setDialog(null)}/>}
+ </section>;
+}
+function Bars({groups,onSelect}){const max=Math.max(1,...groups.map(g=>g.rows.length));return <div className="pulse-bars">{groups.map(g=><button type="button" key={g.label} className="pulse-bar-row" onClick={()=>onSelect(g.label,g.rows)} aria-label={`${g.label}: ${g.rows.length}; view records`}><span>{g.label}</span><span className="pulse-bar-track"><span style={{width:`${g.rows.length/max*100}%`,background:g.color}}/></span><strong>{g.rows.length}</strong></button>)}</div>;}
+function DashboardDialog({dialog,onClose}){
+ const modal=useModalDialog(true,onClose);const [query,setQuery]=useState(''),[page,setPage]=useState(1);
+ const filtered=dialog.rows.filter(r=>`${r.title} ${r.type} ${r.status}`.toLowerCase().includes(query.toLowerCase()));const pages=Math.max(1,Math.ceil(filtered.length/8));
+ return <div className="projects-backdrop" onClick={e=>{if(e.target===e.currentTarget)onClose();}}><div className="projects-dialog pulse-detail-dialog" {...modal}><div className="modal-header"><div><h3>{dialog.title}</h3><p>{dialog.rows.length} records · Read-only overview</p></div><button className="close-modal" type="button" aria-label="Close dashboard details" onClick={onClose}>×</button></div><div className="pulse-detail-body"><label>Search records<input type="search" value={query} onChange={e=>{setQuery(e.target.value);setPage(1);}} placeholder="Title, module or status…"/></label>{filtered.slice((page-1)*8,page*8).map(r=><article key={r.key} className="pulse-detail-row"><div><small>{r.type} · {r.status}{r.date?` · ${dateText(r.date)}`:''}</small><h4>{r.title||'Untitled'}</h4>{(r.source.description||r.source.notes||r.source.client)&&<p>{r.source.description||r.source.notes||r.source.client}</p>}</div><Link className="secondary-btn" to={r.type==='Ticket'?r.path:`${r.path}?open=${encodeURIComponent(r.id)}`}>Open {r.type==='Support item'?'item':r.type.toLowerCase()} →</Link></article>)}{!filtered.length&&<div className="pulse-empty"><p>No matching records.</p></div>}<div className="projects-pagination"><span>Page {page}/{pages}</span><button type="button" className="secondary-btn" disabled={page===1} onClick={()=>setPage(page-1)}>Previous</button><button type="button" className="secondary-btn" disabled={page===pages} onClick={()=>setPage(page+1)}>Next</button></div></div></div></div>;
 }

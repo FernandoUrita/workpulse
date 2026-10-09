@@ -11,13 +11,6 @@ export default function ItemCard({ item, onView, onEdit, onDelete, onCheckin }) 
     : null;
 
   let metaRows = [];
-  if (item.type === 'monitoring' && item.nextCheck) {
-    metaRows.push({
-      icon: 'fa-calendar-check',
-      label: 'Next check',
-      value: formatDate(item.nextCheck)
-    });
-  }
   if (item.type === 'project' && item.endDate) {
     metaRows.push({
       icon: 'fa-calendar-xmark',
