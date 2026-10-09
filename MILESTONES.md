@@ -21,10 +21,20 @@ Statuses below describe delivered code, not confirmation that SQL/configuration 
 | Client Tier Badges | Delivered: Standard / VIP / VVIP / VVVIP |
 | Assignment Workflow | Delivered: Head/admin → POC → Dev/QA, assignment alerts |
 | Scheduled overdue/stale server alerts | Pending; existing client-generated alerts do not provide a server scheduler |
-| Projects in Reports / global Activity | Pending integration |
+| Projects in global Activity | Delivered: access-filtered Project audit, search, filters and deep links |
+| Projects in Reports | Pending integration |
 
 Next validation: install Projects SQL; test permissions with head, POC, employee, Dev/QA; verify assignment notifications and Netlify production build. Then implement server-scheduled overdue/stale reminders and Projects reporting integration.
 
 October 9 correction: Projects now includes all 15 agreed fixed columns, expandable groups, atomic CSV import and head approval/rejection. Live SQL/acceptance verification remains pending.
 
 October 9 refinement: Project client/tier inherited by all rows, 13-field CSV import, plain text Dev/QA names; POC remains account-linked.
+
+## Project monitoring updates
+- Delivered: Projects sidebar dropdown, Group POC/Admin/Head restricted monitoring dashboard, live row overview, status and pending party filters, deployment watch, paginated cards, append-only monitoring posts and history.
+- Pending in user environment: apply monitoring SQL migration; verify permissions with supplied rollback test; browser visual review.
+
+October 9: Projects Activity integration delivered; current source includes compact Settings, clean bell preferences, interactive Dashboard and searchable Project workspaces. Closed-app push and admin/membership/monitoring SQL installation remain unverified in the user environment. Dev/QA are text names and do not grant access or receive account notifications.
+
+## Daily dashboard reference update
+Delivered: greeting, daily cards, attention queue, schedule, recent records and collapsible clickable charts. Build and scoped lint validated; browser and production data checks remain.
