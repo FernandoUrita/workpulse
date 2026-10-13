@@ -1,0 +1,127 @@
+import { lazy } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'motion/react';
+import { useAuth } from './context/AuthContext.jsx';
+import AppLayout from './components/layout/AppLayout.jsx';
+import LoginPage from './components/auth/LoginPage.jsx';
+import RegisterPage from './components/auth/RegisterPage.jsx';
+import RoleGuard from './components/auth/RoleGuard.jsx';
+
+const ProjectMonitoringPage = lazy(() => import('./features/projects/ProjectMonitoringPage.jsx'));
+const ProjectsPage = lazy(() => import('./features/projects/ProjectsPage.jsx'));
+const UsersPage = lazy(() => import('./features/admin/UsersPage.jsx'));
+const ReportsPage = lazy(() => import('./features/reports/ReportsPage.jsx'));
+const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage.jsx'));
+const TasksPage = lazy(() => import('./features/tasks/TasksPage.jsx'));
+const MeetingsPage = lazy(() => import('./features/meetings/MeetingsPage.jsx'));
+const ItemsPage = lazy(() => import('./features/items/ItemsPage.jsx'));
+const MomTemplatesPage = lazy(() => import('./features/mom/MomTemplatesPage.jsx'));
+const SettingsPage = lazy(() => import('./features/settings/SettingsPage.jsx'));
+const ActivityPage = lazy(() => import('./features/activity/ActivityPage.jsx'));
+const TicketsPage = lazy(() => import('./features/tickets/TicketsPage.jsx'));
+
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'var(--text-secondary)'
+      }}>
+        <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px' }}></i>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+function PublicRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'var(--text-secondary)'
+      }}>
+        <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px' }}></i>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
+export default function App() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <Routes location={location} key={location.pathname}>
+        {/* Public routes */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+
+        {/* Protected routes */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/monitoring" element={<ProjectMonitoringPage />} />
+          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/meetings" element={<MeetingsPage />} />
+          <Route path="/items" element={<ItemsPage />} />
+          <Route path="/tickets" element={<TicketsPage />} />
+          <Route path="/mom" element={<MomTemplatesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/reports" element={
+            <RoleGuard allowedRoles={['head', 'admin']}>
+              <ReportsPage />
+            </RoleGuard>
+          } />
+          <Route path="/users" element={<RoleGuard allowedRoles={['admin']}><UsersPage /></RoleGuard>} />
+          <Route path="/activity" element={<ActivityPage />} />
+        </Route>
+
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}

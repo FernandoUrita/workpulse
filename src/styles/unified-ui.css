@@ -1,0 +1,183 @@
+/* WorkPulse Unified UI — shared presentation, never workflow/status logic.
+   Tokens are the single sizing contract for every workspace module. */
+:root {
+ --primary:#3478f6; --primary-dark:#2563eb; --primary-light:#eaf2ff;
+ --text:#17233d; --text-secondary:#64748b; --bg:#f8fafc;
+ --border:#dfe7f1; --radius:12px; --sidebar-width:240px;
+ --wp-control-height:40px; --wp-surface-shadow:0 2px 8px rgba(23,35,61,.035);
+ --wp-body:14px; --wp-helper:12px; --wp-heading:28px;
+}
+[data-theme="dark"] { --text:#f1f5f9; --text-secondary:#a8b7cb; --bg:#0f172a; --border:#334155; --primary-light:#203452; }
+body { font-size:var(--wp-body); line-height:1.5; }
+.main-content { min-width:0; padding:0 24px 24px; }
+.module { padding:0; border-radius:0; }
+.module-header,.monitoring-heading { margin-bottom:24px; gap:16px; }
+.module-header h3,.module-heading h3,.monitoring-heading h2,.pulse-dashboard .pulse-hero h2 {
+ font-size:var(--wp-heading)!important; line-height:1.25; letter-spacing:-.6px; font-weight:700;
+}
+.module-description,.monitoring-heading p,.pulse-dashboard .pulse-hero p { font-size:14px!important; line-height:1.5; margin-top:8px; }
+.topbar { min-height:72px; padding:16px 0; margin-bottom:24px; }
+.topbar-left h2 { font-size:18px!important; }
+.sidebar-header { padding:20px 16px; min-height:72px; }
+.sidebar-header .logo h2 { font-size:26px; letter-spacing:-.7px; }
+.sidebar-header .logo { gap:8px; }.sidebar-header .logo i { font-size:22px; }
+.sidebar-nav .nav-item a,.sidebar-group-toggle,.sidebar-group-children a {
+ min-height:40px; font-size:14px!important; padding:10px 12px; border-radius:8px;
+}
+.sidebar-nav .nav-item > a.active,.sidebar-group-children a.active {
+ background:var(--primary-light)!important; color:var(--primary)!important; box-shadow:none!important;
+}
+.sidebar-group-toggle.group-active { background:var(--primary-light); color:var(--primary); }
+.sidebar-nav .nav-item a i,.sidebar-group-toggle>i:first-child { width:20px; font-size:18px; }
+.user-profile { padding:16px; }.user-avatar { font-size:36px; }
+/* Explicit class families keep icon buttons and calendar cells independent. */
+.primary-btn,.secondary-btn,.danger-btn,.btn,.confirm-cancel,.confirm-delete,
+.monitoring-card footer button,.projects-table .project-row-actions button {
+ min-height:40px!important; font-size:14px!important; line-height:1.3;
+ padding:9px 14px; border-radius:8px!important; box-shadow:none!important;
+ display:inline-flex; align-items:center; justify-content:center; gap:8px;
+}
+.primary-btn { background:var(--primary); }.secondary-btn { background:var(--card-bg); }
+.primary-btn:hover,.secondary-btn:hover,.danger-btn:hover { transform:none!important; }
+.icon-btn,.close-modal { min-width:36px; min-height:36px; border-radius:8px; }
+.main-content :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select),
+.modal-body :is(input:not([type=checkbox]):not([type=radio]),select),.projects-form :is(input:not([type=checkbox]),select) {
+ min-height:40px; font-size:14px!important; line-height:1.4; padding:9px 12px;
+ border:1px solid var(--border); border-radius:8px; color:var(--text); background:var(--card-bg);
+}
+.main-content textarea,.modal-body textarea,.projects-form textarea { font-size:14px!important; line-height:1.6; border-radius:8px; }
+:where(button,a,input,select,textarea):focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
+.main-content :is(.form-group,.settings-item,.projects-form,.monitoring-filters,.projects-toolbar) label { font-size:14px; }
+.toolbar,.projects-toolbar,.monitoring-filters { gap:12px; padding:16px; border:1px solid var(--border); border-radius:12px; background:var(--card-bg); box-shadow:none; flex-wrap:wrap; }
+.search-box { min-width:min(240px,100%); }.filter-group { flex-wrap:wrap; }
+.ticket-tab,.item-tab,.reports-filter-chip,.view-toggle-btn,.settings-workspace-nav button { min-height:40px; font-size:14px!important; border-radius:8px; }
+/* Cards and summaries share surfaces. Internal layouts remain module-specific. */
+.stat-card,.ticket-stat-card,.item-stat-card,.reports-stat-card,.task-card,.ticket-card,.meeting-card,.item-card,
+.settings-group,.monitoring-card,.monitoring-panel,.monitoring-project-bar,.project-overview,.admin-table,
+.reports-table-wrapper,.employee-report-table,.pulse-dashboard .pulse-panel,.pulse-dashboard .pulse-kpi {
+ border:1px solid var(--border); border-radius:12px!important; background:var(--card-bg); box-shadow:var(--wp-surface-shadow);
+}
+.task-card,.ticket-card,.meeting-card,.item-card,.settings-group,.monitoring-card,.monitoring-panel { padding:24px; }
+.stat-card:hover,.ticket-stat-card:hover,.item-stat-card:hover,.reports-stat-card:hover,.pulse-kpi:hover { transform:none!important; }
+.stat-card p,.ticket-stat-card p,.item-stat-card p,.reports-stat-card p { font-size:12px; }
+.monitoring-stats>div { padding:20px; border-radius:12px; }
+.monitoring-stats strong,.pulse-kpi strong { font-size:28px!important; }
+.monitoring-stats span,.pulse-kpi>span { font-size:14px!important; }
+.main-content :is(.ticket-subject,.task-text,.item-text,.meeting-title,.monitoring-card h4) { font-size:16px; line-height:1.5; }
+.main-content :is(.ticket-desc,.meeting-agenda,.monitoring-summary,.monitoring-next,.pulse-recent strong,.pulse-attention>span) { font-size:14px!important; line-height:1.6; }
+.main-content small,.monitoring-card-meta,.monitoring-card-top>span:first-child,.monitoring-card footer small,.pulse-dashboard .pulse-recent small,.pulse-dashboard .pulse-attention small { font-size:12px!important; line-height:1.5; }
+.project-chip,.project-tier,.project-review,.role-badge,.status-badge,.priority-badge { font-size:12px!important; line-height:1.4; padding:4px 8px; border-radius:999px; }
+/* Wide tables scroll instead of shrinking text to fit the viewport. */
+.projects-table { max-width:100%; overflow:auto; border-radius:12px; }
+.projects-table table { table-layout:auto!important; min-width:1900px!important; width:100%; }
+.projects-table-fit table { min-width:1600px!important; }
+.projects-table :is(th,td),.projects-table-fit :is(th,td),.reports-table :is(th,td),.admin-table :is(th,td),.employee-report-table :is(th,td) {
+ padding:16px 12px!important; font-size:14px!important; line-height:1.5; vertical-align:middle; text-align:left;
+}
+.projects-table th { position:sticky; top:0; z-index:1; background:var(--bg); white-space:nowrap; }
+.projects-table td { min-width:120px; max-width:320px; }.projects-table td.project-remarks-column { min-width:280px; }
+.projects-table-fit .project-row-actions { flex-direction:row; }
+.projects-table th,.reports-table th,.admin-table th { font-weight:600; letter-spacing:0; text-transform:none; }
+.projects-table tr:last-child td { border-bottom:0; }
+.projects-table tbody tr:hover { background:color-mix(in srgb,var(--primary) 4%,var(--card-bg)); }
+.project-remarks-preview { -webkit-line-clamp:2; }.project-remarks-link { font-size:14px; }
+/* Reporting freshness is independent from actual project status. */
+.monitoring-card.freshness-missing { border-left:1px solid var(--border)!important; }
+.monitoring-freshness.missing { color:var(--text-secondary)!important; }
+.monitoring-freshness { font-size:12px; margin-top:8px; }
+.monitoring-card footer { padding-top:16px; gap:8px; }.monitoring-card footer .primary-btn { margin-left:auto; }
+.monitoring-deadline strong,.monitoring-deadline div>span { font-size:14px; }
+.monitoring-overview { gap:24px; }.monitoring-cards { gap:24px; grid-template-columns:repeat(auto-fit,minmax(min(330px,100%),1fr)); }
+/* Dashboard uses the same canvas; no enclosing gradient or competing styles. */
+.pulse-dashboard { padding:0!important; background:none!important; border-radius:0!important; }
+.pulse-dashboard .pulse-hero { padding:0!important; background:none!important; border:0; margin-bottom:24px; }
+.pulse-dashboard .pulse-panel { padding:24px; }
+.pulse-dashboard .pulse-panel h3,.monitoring-panel h3,.settings-group h4 { font-size:18px!important; font-weight:600; }
+.pulse-dashboard .pulse-panel header p,.pulse-dashboard .pulse-kpi small { font-size:12px!important; }
+.pulse-dashboard .pulse-daily-grid { gap:24px; }.pulse-dashboard .pulse-kpi { padding:20px; }
+.pulse-dashboard .pulse-schedule strong,.pulse-dashboard .pulse-schedule time { font-size:14px; }
+.settings-workspace { max-width:1200px; }.settings-workspace-layout { gap:24px; grid-template-columns:216px minmax(0,1fr); }
+.settings-workspace .settings-item { margin:0; padding:12px 0; }.settings-workspace .settings-group { padding:24px; }
+.settings-item input { width:100%; }.settings-workspace-nav { border-radius:12px; }
+.template-preview pre,.mom-preview { font-size:14px!important; line-height:1.7; padding:24px; white-space:pre-wrap; overflow-wrap:anywhere; max-height:65vh; overflow:auto; }
+.empty-state-enhanced { border-radius:12px; padding:40px 24px; }.empty-state-enhanced h3 { font-size:18px; }.empty-state-enhanced p { font-size:14px; }
+.modal-content,.projects-dialog { border-radius:12px; }.modal-header { border-radius:12px 12px 0 0; padding:20px 24px; }.modal-footer { border-radius:0 0 12px 12px; padding:16px 24px; }
+.modal-header h3 { font-size:20px; }.modal-body { padding:24px; }
+@media(max-width:1100px) { .monitoring-overview { grid-template-columns:1fr; }.monitoring-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:768px) {
+ .main-content { padding:0 16px 24px; }.module-header h3,.monitoring-heading h2,.pulse-dashboard .pulse-hero h2 { font-size:24px!important; }
+ .toolbar,.projects-toolbar,.monitoring-filters { padding:12px; }.filter-group { width:100%; }
+ .settings-workspace-layout { grid-template-columns:1fr; }.settings-workspace-nav { position:static; }
+ .pulse-dashboard .pulse-daily-grid { grid-template-columns:1fr; }
+ .module-actions { width:100%; }.monitoring-cards { grid-template-columns:1fr; }
+ .projects-toolbar label,.monitoring-filters label { flex:1 1 180px; min-width:0; }
+}
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
+
+/* Secondary module surfaces also follow the shared contract. */
+.activity-stat,.activity-item,.activity-filters,.template-container,.admin-notice { border-radius:12px; }
+.activity-stat { background:var(--card-bg); border:1px solid var(--border); padding:16px; }
+.activity-filters { gap:12px; flex-wrap:wrap; }.activity-item { padding:16px; }
+.activity-item :is(.activity-text,.activity-description),.reports-user-cell strong { font-size:14px!important; }
+.activity-item small,.reports-user-cell span,.admin-user small { font-size:12px!important; }
+.reports-filters { gap:8px; }.reports-table-wrapper,.admin-table { max-width:100%; overflow:auto; }
+.reports-table { min-width:980px; }.admin-table table { min-width:760px; }
+.projects-table .project-icon-action { min-width:36px!important; width:36px!important; min-height:36px!important; padding:8px!important; }
+.main-content .template-preview pre { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; }
+.meeting-card .meeting-meta,.ticket-card .ticket-meta,.item-card .item-meta { font-size:12px!important; line-height:1.6; }
+/* Unified layouts, version 2: module-specific content within one shared shell. */
+.sidebar-header { order:0; }.sidebar-nav { order:1; }.user-profile { order:2; margin-top:auto; border-top:1px solid var(--border); border-bottom:0; }.sidebar-footer { order:3; }
+.wp-breadcrumb { display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text-secondary); }.wp-breadcrumb strong {color:var(--text);font-weight:600;}
+.wp-surface { background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px; }
+.wp-surface h4,.wp-surface h3 {font-size:18px;margin:0 0 12px;}.wp-surface p {margin:8px 0;color:var(--text-secondary);}
+.wp-summary-strip {display:flex;flex-wrap:wrap;gap:16px;align-items:center;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:16px 24px;margin-bottom:24px;}
+.wp-summary-strip>span {display:flex;gap:8px;align-items:center;padding-right:16px;border-right:1px solid var(--border);color:var(--text-secondary);}.wp-summary-strip>span:last-child{border:0;}.wp-summary-strip strong{font-size:20px;color:var(--text);}
+.wp-avatar {width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--primary-light);color:var(--primary);font-size:12px;font-weight:600;flex-shrink:0;}
+.wp-user-cell,.wp-person {display:flex;gap:12px;align-items:center;}.wp-user-cell small,.wp-person small {display:block;color:var(--text-secondary);}.wp-user-cell .project-chip {margin-left:8px;}
+.wp-team {display:grid;gap:8px;}.wp-person {gap:8px;font-size:14px;}.wp-person .wp-avatar{width:28px;height:28px;}.wp-customization strong {font-size:14px;display:block;}.wp-customization .project-chip {margin-top:6px;display:inline-block;}
+.projects-table-fit table{min-width:1150px!important;}.projects-table-fit td{min-width:100px!important;}.projects-table-fit td:first-child{min-width:215px!important;max-width:300px;}.projects-table-fit td:nth-child(4){min-width:180px!important;}.projects-table-fit td.project-remarks-column{min-width:230px!important;}
+.project-workspace-summary{padding:16px 0;gap:20px;}.project-overview-actions{margin:8px 0 16px;}.projects-toolbar{margin:0 0 16px;}.project-workspace-table .project-group-body{padding:0 20px 20px;}.project-workspace-bar{border-radius:12px;padding:20px;}
+.wp-meeting {display:grid;grid-template-columns:128px minmax(0,1fr);gap:24px;padding:24px!important;margin-bottom:16px;}
+.wp-date-tile {background:var(--bg);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:160px;}.wp-date-tile strong{font-size:24px;text-transform:uppercase;}.wp-date-tile>span{border:1px solid var(--border);border-radius:8px;background:var(--card-bg);padding:8px;font-size:14px;}
+.wp-meeting-body{min-width:0;}.wp-meeting-body>header{display:flex;align-items:center;flex-wrap:wrap;gap:8px;}.wp-meeting-body h4{font-size:18px;margin-right:auto;}.wp-meeting-meta{display:flex;flex-wrap:wrap;gap:16px;color:var(--text-secondary);margin:12px 0;}
+.wp-meeting-agenda{padding:12px 0;border-top:1px solid var(--border);}.wp-meeting-agenda small,.wp-meeting-link small{display:block;color:var(--text-secondary);margin-bottom:4px;}.wp-meeting-agenda li{margin:4px 0;}.wp-meeting-link{margin:8px 0;overflow-wrap:anywhere;}.wp-meeting-link a{color:var(--primary);}.wp-mom-excerpt{white-space:pre-wrap;max-height:90px;overflow:hidden;color:var(--text-secondary);}.wp-connection{margin:12px 0;}
+.wp-card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;}.wp-meeting-body>footer{border-top:1px solid var(--border);padding-top:16px;justify-content:flex-end;margin-top:16px;}
+.wp-more{position:relative;flex-shrink:0;}.wp-more>summary{list-style:none;cursor:pointer;width:36px;min-height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;font-size:20px;background:var(--card-bg);}.wp-more>summary::-webkit-details-marker{display:none;}.wp-more[open]>button{position:absolute;right:0;top:44px;z-index:5;white-space:nowrap;box-shadow:var(--shadow)!important;background:var(--card-bg);color:var(--danger);border:1px solid var(--border);}
+.wp-template-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start;}.wp-template-layout .template-management{margin:0;min-width:0;border-radius:12px;padding:24px;}.wp-template-help{display:grid;gap:24px;}.wp-placeholder{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;margin:10px 0;}.wp-placeholder code{padding:8px;background:var(--bg);border-radius:6px;font-size:12px;}.wp-preview-tabs{display:flex;gap:8px;margin:16px 0;}.wp-preview-tabs [aria-pressed=true]{color:var(--primary);border-color:var(--primary);background:var(--primary-light);}
+.wp-document{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:24px;max-height:65vh;overflow:auto;}.wp-document h4{font-size:18px;margin:20px 0 12px;}.wp-document h4:first-child{margin-top:0;}.wp-document p{font-size:14px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin:3px 0;}
+.wp-data-table{width:100%;overflow:auto;border:1px solid var(--border);border-radius:12px;background:var(--card-bg);}.wp-data-table table{border-collapse:collapse;width:100%;min-width:850px;}.wp-data-table th,.wp-data-table td{padding:16px 12px;border-bottom:1px solid var(--border);text-align:left;font-size:14px;}.wp-data-table th{background:var(--bg);font-weight:600;}.wp-data-table td small{display:block;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-secondary);}.wp-text-button{background:none;border:0;color:var(--text);font:inherit;text-align:left;cursor:pointer;}.wp-text-button:hover{color:var(--primary);}.wp-data-table tr:last-child td{border-bottom:0;}
+.ticket-card-remarks{background:color-mix(in srgb,var(--warning) 10%,var(--card-bg));padding:12px 16px;border-radius:8px;font-size:14px;color:var(--text);margin-top:12px;}.ticket-card-subject{font-size:18px;font-weight:600;}.ticket-card-meta{border-top:1px solid var(--border);padding:16px 0;gap:24px;}.ticket-card-actions,.item-card-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;border-top:1px solid var(--border);padding-top:16px;}.items-grid{grid-template-columns:repeat(auto-fit,minmax(min(400px,100%),1fr));}.item-card{display:flex;flex-direction:column;}.item-card-actions{margin-top:auto;}.item-card .item-card-title{font-size:18px;}
+.wp-profile-heading{display:flex;gap:12px;align-items:center;margin:20px 0;}.wp-profile-heading .wp-avatar{width:48px;height:48px;font-size:18px;}.settings-workspace .settings-actions{border-top:1px solid var(--border);padding-top:16px;display:flex;justify-content:flex-end;}.settings-workspace-nav button:last-child{margin-top:12px;border-top:1px solid var(--border);color:var(--danger);}
+.admin-note{background:var(--primary-light);color:var(--text-secondary);padding:16px;border-radius:8px;font-size:14px;}.admin-tabs{display:flex;gap:8px;margin:20px 0;}.admin-tabs [aria-pressed=true]{border-color:var(--primary);color:var(--primary);}.admin-tools{gap:12px;}.reports-reminder-actions>.btn{display:none;}.activity-group{border:1px solid var(--border);border-radius:12px;padding:20px;background:var(--card-bg);margin:16px 0;}.activity-card{padding:16px;border:1px solid var(--border);border-radius:10px;margin:12px 0;}.activity-card-title{font-size:14px;}.activity-card-content{min-width:0;}.activity-group-label{font-size:14px;}.activity-bar{background:var(--primary)!important;}
+.wp-reporting{margin-bottom:24px;}.wp-reporting .wp-summary-strip{border:0;padding:0;margin:0;}.monitoring-status-line .monitoring-meter>span{background:var(--primary);}.monitoring-freshness{display:flex;gap:6px;align-items:center;}.monitoring-freshness::before{content:'◷';}.monitoring-summary{border-top:1px solid var(--border);padding-top:12px;}.monitoring-panel .monitoring-deadline small{color:var(--text-secondary);}
+.task-stats-grid{gap:0!important;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card-bg);}.task-stats-grid>.task-stat-card{border:0!important;border-right:1px solid var(--border)!important;border-radius:0!important;box-shadow:none!important;}.filter-chips{gap:8px;}.filter-chip{min-height:40px;font-size:14px;border-radius:8px;}
+@media(max-width:1050px){.wp-template-layout{grid-template-columns:1fr;}.wp-template-help{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:650px){.wp-meeting{grid-template-columns:1fr;gap:16px;}.wp-date-tile{min-height:0;padding:12px;flex-direction:row;flex-wrap:wrap;}.wp-date-tile strong{font-size:18px;}.wp-meeting-body>footer{justify-content:flex-start;}.wp-template-help{grid-template-columns:1fr;}.wp-summary-strip{padding:16px;}.wp-breadcrumb{font-size:12px;gap:8px;}.wp-document{padding:16px;}.wp-template-layout .template-management{padding:16px;}.task-stats-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* Project history reader: bounded, scrollable body and consistent dialog controls. */
+.wp-history-dialog{width:min(720px,100%);display:flex;flex-direction:column;overflow:hidden;max-height:calc(100dvh - 40px);}.wp-history-dialog .modal-header,.wp-history-dialog .modal-footer{flex-shrink:0;position:static;}.wp-history-body{padding:24px;overflow:auto;overscroll-behavior:contain;min-height:0;}.wp-history-note{font-size:12px;color:var(--text-secondary);margin-bottom:20px;}.wp-history-list{list-style:none;padding:0;margin:0;}.wp-history-list li{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border);}.wp-history-list li:last-child{border-bottom:0;}.wp-history-marker{width:36px;height:36px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;}.wp-history-list strong{font-size:14px;overflow-wrap:anywhere;}.wp-history-list p{margin:4px 0;color:var(--text-secondary);}.wp-history-list time{font-size:12px;color:var(--text-secondary);}
+
+/* Sidebar identity: reserve a real grid track for logout; truncate text in its own track. */
+.sidebar .user-profile{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;gap:12px;padding:16px;flex-shrink:0;}
+.sidebar .user-avatar{font-size:36px;width:36px;line-height:1;}
+.sidebar .user-info{min-width:0;overflow:hidden;}
+.sidebar .user-info h4,.sidebar .user-info>span{display:block;width:100%;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sidebar .user-info h4{font-size:14px;line-height:1.5;}.sidebar .user-info>span{font-size:12px;line-height:1.5;margin-top:2px;}
+.sidebar .logout-btn{width:36px;height:36px;min-width:36px;min-height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;justify-self:end;border:1px solid var(--border);background:var(--card-bg);border-radius:8px;font-size:16px;}
+.sidebar .sidebar-footer .version{display:flex;align-items:center;justify-content:space-between;gap:8px;}.sidebar .sidebar-footer{padding:12px 16px;flex-shrink:0;}
+@media(min-width:769px){.sidebar-minimized .sidebar .user-profile{display:flex;justify-content:center;padding:12px 8px;}.sidebar-minimized .sidebar .user-info,.sidebar-minimized .sidebar .user-avatar{display:none;}}
+
+/* Sidebar design and the third appearance choice use the shared theme tokens. */
+.wp-sidebar-avatar{display:flex;width:36px;height:36px;border-radius:50%;align-items:center;justify-content:center;background:var(--primary);color:white;font-size:14px;font-weight:600;}
+.sidebar-group-toggle .badge{min-width:22px;text-align:center;background:var(--primary-light);color:var(--primary);border-radius:999px;font-size:12px;padding:2px 6px;}
+.theme-preview{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px!important;}.theme-option{min-width:0;text-align:left;border-radius:12px;padding:20px!important;}.theme-option small{display:block;margin-top:8px;color:var(--primary);}.wp-theme-swatch{height:72px;border:1px solid #dfe7f1;border-radius:8px;display:grid;grid-template-columns:24% 1fr;gap:6px;padding:8px;margin-bottom:16px;background:#f8fafc;}.wp-theme-swatch span{border-radius:4px;background:#fff;}.wp-theme-swatch span:first-child{grid-row:span 2;background:#eaf2ff;}.wp-theme-swatch span:last-child{background:#3478f6;}.swatch-dark{background:#0f172a;border-color:#334155;}.swatch-dark span{background:#1e293b;}.swatch-dark span:first-child{background:#203452;}.swatch-pink{background:#fff5f8;border-color:#f1ccda;}.swatch-pink span{background:#fffafd;}.swatch-pink span:first-child{background:#fce4ee;}.swatch-pink span:last-child{background:#b92c64;}
+[data-theme="pink"]{--primary:#b92c64;--primary-dark:#98214f;--primary-light:#fce4ee;--bg:#fff5f8;--card-bg:#fffafd;--text:#452636;--text-secondary:#795366;--border:#efd2df;--shadow:0 4px 20px rgba(105,35,65,.07);--wp-surface-shadow:0 2px 8px rgba(105,35,65,.035);}
+[data-theme="pink"] .sidebar,[data-theme="pink"] .topbar{background:var(--card-bg);}
+[data-theme="pink"] .sidebar-nav .nav-item a .badge{background:var(--primary);color:white;}
+[data-theme="pink"] .theme-option.active{border-color:var(--primary);background:var(--primary-light);}
+[data-theme="pink"] :is(.project-chip.chip-blue,.role-badge.role-employee,.attendee-pill){background:var(--primary-light);color:var(--primary-dark);}
+[data-theme="pink"] .pulse-dashboard :is(.pulse-record-icon,.kpi-blue>i:first-child),[data-theme="pink"] .pulse-dashboard .pulse-recent>.tag-task{background:var(--primary-light);color:var(--primary);}
+[data-theme="pink"] .pulse-dashboard :is(.pulse-kpi small,.pulse-recent time,.pulse-hero h2){color:var(--text);}
+[data-theme="pink"] .pulse-dashboard .pulse-attention,[data-theme="pink"] .pulse-dashboard .pulse-schedule{background:var(--card-bg);}
+[data-theme="pink"] :is(.cmd-trigger,.project-picker-trigger){background:var(--card-bg);color:var(--text);border-color:var(--border);}
+@media(max-width:650px){.theme-preview{grid-template-columns:1fr!important;}.wp-theme-swatch{height:64px;}}

@@ -1,0 +1,49 @@
+/* WorkPulse shared module UI. Preserve existing theme and status meanings. */
+:root { --wp-control-height: 42px; --wp-surface-shadow: 0 2px 8px rgba(15,23,42,.035); }
+.main-content { min-width: 0; }
+.module { border-radius: 18px; }
+.module-header { gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 24px; }
+.module-heading { min-width: 0; flex: 1; }.module-heading h3 { font-size: 22px; letter-spacing: -.025em; }
+.module-description { font-size: 13px; line-height: 1.6; color: var(--text-secondary); margin-top: 6px; max-width: 600px; }
+.module-actions { gap: 8px; flex-wrap: wrap; align-items: center; }
+:where(.primary-btn,.secondary-btn,.danger-btn,.btn,.confirm-cancel,.confirm-delete) { min-height: var(--wp-control-height); border-radius: 10px; justify-content: center; line-height: 1.3; font-weight: 600; gap: 8px; box-shadow: none; transition: background-color 140ms,border-color 140ms,box-shadow 140ms; }
+.primary-btn { box-shadow: 0 3px 8px color-mix(in srgb,var(--primary) 18%,transparent); }
+:where(.primary-btn,.secondary-btn,.danger-btn):not(:disabled):hover { transform: none; }
+.secondary-btn { background: var(--card-bg); }.secondary-btn:not(:disabled):hover { background: var(--bg); border-color: color-mix(in srgb,var(--text-secondary) 50%,var(--border)); }
+:where(button):disabled { opacity: .5; cursor: not-allowed; }
+:where(button,a,input,select,textarea):focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.toolbar { padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--card-bg); gap: 12px; align-items: center; flex-wrap: wrap; box-shadow: var(--wp-surface-shadow); }
+.search-box { min-width: 200px; flex: 1; }.search-box input { min-height: var(--wp-control-height); font-size: 13px; border-radius: 9px; }
+.filter-group { display: flex; gap: 8px; flex-wrap: wrap; min-width: 0; }.filter-group select { min-height: var(--wp-control-height); max-width: 100%; border-radius: 9px; padding: 9px 30px 9px 12px; font-size: 12px; background-color: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
+:where(.ticket-tabs,.item-tabs,.reports-filters,.detail-tabs) { gap: 8px; flex-wrap: wrap; }
+:where(.ticket-tab,.item-tab,.reports-filter-chip,.view-toggle-btn) { min-height: 38px; border-radius: 9px; font-size: 12px; }
+:where(.stat-card,.ticket-stat-card,.item-stat-card,.reports-stat-card) { border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--wp-surface-shadow); }
+:where(.stat-card,.ticket-stat-card,.item-stat-card,.reports-stat-card):hover { transform: none; }
+:where(.task-card,.ticket-card,.meeting-card,.item-card,.settings-group) { border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--wp-surface-shadow); }
+:where(.task-card,.ticket-card,.meeting-card,.item-card):hover { box-shadow: 0 4px 16px rgba(15,23,42,.06); }
+:where(.task-text,.ticket-subject,.item-text,.meeting-title) { overflow-wrap: anywhere; line-height: 1.5; }
+:where(.icon-btn,.close-modal) { min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; }
+:where(.icon-btn,.close-modal):hover { transform: none; background: var(--bg); }
+:where(.reports-table-wrapper,.admin-table,.employee-report-table) { border: 1px solid var(--border); border-radius: 12px; background: var(--card-bg); }
+:where(.reports-table,.admin-table table,.employee-report-table table) th { background: var(--bg); font-size: 11px; letter-spacing: .025em; font-weight: 700; }
+:where(.reports-table,.admin-table table,.employee-report-table table) td { padding: 14px 12px; font-size: 12px; line-height: 1.5; }
+.empty-state-enhanced { border: 1px dashed var(--border); border-radius: 16px; padding: 40px 20px; background: var(--card-bg); box-shadow: none; }
+.empty-state-enhanced h3 { font-size: 18px; }.empty-state-enhanced p { max-width: 440px; margin: 10px auto 20px; line-height: 1.6; }
+.empty-state-enhanced .empty-illustration { width: 64px; height: 64px; font-size: 26px; margin-bottom: 16px; }
+.modal { padding: 20px; background: rgba(15,23,42,.58); z-index: 11000; }
+.modal-content { width: min(560px,100%); max-width: 560px; max-height: calc(100dvh - 40px); padding: 0; border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 24px 72px rgba(0,0,0,.22); overflow-y: auto; overscroll-behavior: contain; }
+.modal-content:focus { outline: none; }.modal-header { position: sticky; top: 0; z-index: 2; background: var(--card-bg); padding: 20px 24px; margin: 0; border-bottom: 1px solid var(--border); gap: 16px; border-radius: 18px 18px 0 0; }.modal-header h3 { font-size: 18px; line-height: 1.4; letter-spacing: -.02em; }
+.modal-body { padding: 22px 24px; }.modal-footer { position: sticky; bottom: 0; z-index: 2; background: var(--card-bg); padding: 16px 24px; margin: 0; border-top: 1px solid var(--border); border-radius: 0 0 18px 18px; gap: 10px; }
+.modal-body :where(input:not([type=checkbox]):not([type=radio]),select,textarea) { background: var(--card-bg); font-size: 13px; border-width: 1px; border-radius: 9px; padding: 11px 12px; min-height: 42px; margin-bottom: 0; }
+.modal-body textarea { resize: vertical; min-height: 96px; }.modal-body :where(input,select,textarea):focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb,var(--primary) 12%,transparent); }
+:where(.form-group,.settings-item) label { font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--text); }
+.form-grid { gap: 18px; }.form-group { gap: 7px; }.modal-body :where(input,select,textarea):disabled { background: var(--bg); color: var(--text-secondary); cursor: not-allowed; }
+.confirm-modal .modal-content { padding: 28px; max-width: 440px; }.confirm-actions { gap: 10px; margin-top: 24px; }.confirm-preview { overflow-wrap: anywhere; }
+:where(.employee-report-dialog,.admin-dialog) { box-shadow: 0 24px 72px rgba(0,0,0,.22); }.admin-dialog { padding: 24px; }.admin-dialog h3 { font-size: 19px; }
+.settings-group { padding: 24px; }.settings-group h4 { font-size: 16px; padding-bottom: 12px; }.settings-item { padding: 14px 0; }.settings-item input { border-radius: 9px; min-height: 42px; }
+.topbar h2 { font-size: 21px; letter-spacing: -.02em; }.topbar-right { gap: 12px; }.sidebar-nav .nav-item a { border-radius: 10px; }.sidebar-nav .nav-item a.active { font-weight: 600; }
+.notif-item { padding: 14px; }.notif-item-title { font-size: 13px; }.notif-item-message { line-height: 1.6; }.notif-panel { border: 1px solid var(--border); border-radius: 16px; }
+@media(max-width:900px) { .module-actions { width: 100%; }.module-header { align-items: flex-start; }.toolbar .filter-group { width: 100%; }.filter-group select { flex: 1; min-width: 130px; }.ticket-stats-grid,.reports-summary { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .module-heading h3 { font-size: 20px; }.module-description { font-size: 12px; }.module-actions .primary-btn { margin-left: auto; }.module-actions :where(.primary-btn,.secondary-btn) { padding: 10px 12px; font-size: 12px; }.toolbar { padding: 12px; }.search-box { width: 100%; min-width: 0; }.modal { padding: 8px; }.modal-content { max-height: calc(100dvh - 16px); width: 100%; border-radius: 14px; }.modal-large { width: 100% !important; }.modal-header { padding: 16px; }.modal-body { padding: 18px 16px; }.modal-footer { padding: 14px 16px; }.modal-footer :where(.primary-btn,.secondary-btn,.danger-btn) { flex: 1; }.form-grid { grid-template-columns: minmax(0,1fr); }.form-group.full-width { grid-column: 1; }.date-display { display: none; }.topbar h2 { font-size: 18px; }.topbar-right { gap: 6px; }.confirm-modal .modal-content { padding: 22px; } }
+.task-modal .modal-content > :where(.task-detail-header,.task-tabs,.task-tab-content), .ticket-modal .modal-content > :where(.ticket-detail-header,.task-tabs,.task-tab-content) { margin-left: 24px; margin-right: 24px; }
+@media(max-width:600px) { .task-modal .modal-content > :where(.task-detail-header,.task-tabs,.task-tab-content), .ticket-modal .modal-content > :where(.ticket-detail-header,.task-tabs,.task-tab-content) { margin-left: 16px; margin-right: 16px; } }
