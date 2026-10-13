@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import MeetingCard from '../src/features/meetings/MeetingCard.jsx';
+import TicketCard from '../src/features/tickets/TicketCard.jsx';
+const noOp=()=>{};
+const renderMeeting=meeting=>renderToStaticMarkup(<MeetingCard meeting={meeting} onViewMom={noOp} onPrint={noOp} onEdit={noOp} onDelete={noOp}/>);
+const base={title:'Review <requirements>',date:'2020-01-01',time:'10:00',type:'remote',platform:'zoom',attendees:['QA'],agenda:['Review scope'],link:'https://example.com/meeting'};
+const past=renderMeeting(base);
+assert.match(past,/Past/);assert.doesNotMatch(past,/>Completed</);assert.match(past,/End meeting &amp; MOM/);assert.match(past,/Open meeting link/);assert.doesNotMatch(past,/>https:\/\/example.com/);assert.match(past,/Review &lt;requirements&gt;/);
+const completed=renderMeeting({...base,completed:true});assert.match(completed,/View MOM/);assert.doesNotMatch(completed,/End meeting &amp; MOM/);
+const invalid=renderMeeting({...base,date:'invalid',link:'javascript:alert(1)'});assert.doesNotMatch(invalid,/href="javascript:/);assert.match(invalid,/Not set/);
+const ticket=renderToStaticMarkup(<TicketCard ticket={{ticketNo:'011044',subject:'Integration fix',status:'In Progress',priority:'High',clientName:'Client',remarks:'Awaiting client confirmation'}} onView={noOp} onEdit={noOp} onDelete={noOp}/>);
+assert.match(ticket,/View details/);assert.match(ticket,/More actions/);assert.match(ticket,/Awaiting client confirmation/);
+console.log('UI render checks passed: meeting lifecycle, safe links, text escaping and ticket actions.');

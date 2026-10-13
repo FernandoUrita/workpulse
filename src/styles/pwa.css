@@ -1,0 +1,12 @@
+.pwa-controls { margin: -8px 0 24px; }
+.pwa-toolbar { display: flex; align-items: start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.pwa-status { display: inline-flex; align-items: center; gap: 8px; padding: 10px 0; color: var(--text-secondary); font-size: 12px; }
+.pwa-status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+.pwa-status.is-offline::before { background: var(--warning); }
+.pwa-install-help { max-width: 360px; font-size: 13px; color: var(--text-secondary); }
+.pwa-install-help summary { cursor: pointer; padding: 10px 0; color: var(--text); }
+.pwa-install-help summary:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.pwa-install-help p { padding: 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; line-height: 1.6; }
+.pwa-notice { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; margin-top: 12px; border: 1px solid var(--primary); border-radius: 12px; background: var(--card-bg); font-size: 14px; line-height: 1.5; }
+.pwa-notice button { flex-shrink: 0; }
+@media (max-width: 640px) { .pwa-notice { align-items: start; flex-direction: column; } .pwa-install-help { max-width: 100%; } }

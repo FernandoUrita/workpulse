@@ -1,0 +1,19 @@
+.employee-report-backdrop { position: fixed; inset: 0; z-index: 11000; background: rgba(15,23,42,.6); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.employee-report-dialog { background: var(--card-bg); color: var(--text); width: min(980px,100%); max-height: 90dvh; border-radius: 18px; border: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: 0 24px 80px rgba(0,0,0,.25); }
+.employee-report-header, .employee-report-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; }
+.employee-report-header { border-bottom: 1px solid var(--border); }
+.employee-report-header p, .employee-report-note { color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
+.employee-report-body { padding: 20px; overflow: auto; min-height: 0; }
+.employee-report-stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin: 16px 0; }
+.employee-report-stats > div { background: var(--bg); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 5px; }
+.employee-report-stats strong { font-size: 24px; }.employee-report-stats span { color: var(--text-secondary); font-size: 11px; }
+.employee-report-tabs, .employee-report-tools, .employee-report-pagination { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; align-items: center; }
+.employee-report-tabs .active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+.employee-report-tabs button { text-transform: capitalize; }.employee-report-tools input { flex: 1; min-width: 180px; }
+.employee-report-tools input, .employee-report-tools select { padding: 10px 12px; background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+.employee-report-table { overflow-x: auto; }.employee-report-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.employee-report-table th, .employee-report-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); vertical-align: top; }.employee-report-table th { color: var(--text-secondary); }.employee-report-table td:first-child { min-width: 200px; overflow-wrap: anywhere; }.employee-report-table small { display: block; color: var(--text-secondary); margin-top: 4px; }
+.employee-report-flag { display: inline-block; padding: 3px 6px; border-radius: 5px; margin: 2px; font-size: 10px; }.employee-report-flag.overdue { color: var(--danger); background: color-mix(in srgb,var(--danger) 12%,var(--card-bg)); }.employee-report-flag.stale { color: var(--warning); background: color-mix(in srgb,var(--warning) 12%,var(--card-bg)); }
+.employee-report-pagination span { flex: 1; font-size: 12px; color: var(--text-secondary); }.employee-report-footer { border-top: 1px solid var(--border); }.employee-report-empty { text-align: center !important; padding: 32px !important; }
+.reports-employee-row { cursor: pointer; }.reports-employee-row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }.reports-employee-row:hover { background: var(--bg); }.reports-employee-open { background: transparent; border: 0; color: inherit; text-align: left; font: inherit; padding: 0; cursor: pointer; }.reports-employee-open strong { color: var(--primary); }
+@media(max-width:600px) { .employee-report-backdrop { padding: 8px; }.employee-report-dialog { max-height: 96dvh; }.employee-report-stats { grid-template-columns: repeat(2,1fr); }.employee-report-header,.employee-report-body,.employee-report-footer { padding: 14px; } }

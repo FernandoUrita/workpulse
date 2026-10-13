@@ -1,0 +1,105 @@
+import { useState } from 'react';
+import { useAppData } from '../../context/AppDataContext.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
+import EditMomTemplateModal from './EditMomTemplateModal.jsx';
+import ConfirmModal from '../../components/common/ConfirmModal.jsx';
+
+export default function MomTemplatesPage() {
+  const { 
+    momTemplate, 
+    updateMomTemplate, 
+    resetMomTemplate,
+    defaultMomTemplate,
+  } = useAppData();
+  const { showToast } = useToast();
+
+  const [previewMode,setPreviewMode]=useState('formatted');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const handleSave = (newTemplate) => {
+    updateMomTemplate(newTemplate);
+    setShowEditModal(false);
+    showToast('success', 'Template Saved', 'Your MOM template has been updated.');
+  };
+
+  const handleResetConfirm = () => {
+    resetMomTemplate();
+    setShowResetConfirm(false);
+    showToast('success', 'Template Reset', 'MOM template restored to default.');
+  };
+
+  const isUsingDefault = momTemplate === defaultMomTemplate;
+
+  return (
+    <section className="module">
+      <div className="module-header">
+        <div className="module-heading"><h3><i className="fas fa-file-alt"></i> MOM Templates</h3><p className="module-description">Prepare consistent meeting minutes with reusable templates.</p></div>
+        {!isUsingDefault && (
+          <div className="module-actions">
+            <span 
+              style={{
+                background: '#fef3c7',
+                color: '#d97706',
+                padding: '6px 14px',
+                borderRadius: '40px',
+                fontSize: '12px',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <i className="fas fa-pen"></i> Custom Template
+            </span>
+          </div>
+        )}
+      </div>
+
+      <details className="template-hints"><summary>How templates work</summary>
+        
+        This template is used when you click <strong>"End Meeting & MOM"</strong> on any meeting. 
+        The <code>{'{title}'}</code>, <code>{'{date}'}</code>, <code>{'{attendees}'}</code>, 
+        and other placeholders will be automatically replaced with actual meeting data.
+      </details>
+
+      <div className="wp-template-layout"><div className="template-management">
+        <div className="template-actions">
+          <button className="primary-btn" onClick={() => setShowEditModal(true)}>
+            <i className="fas fa-edit"></i> Edit Template
+          </button>
+          <button 
+            className="secondary-btn" 
+            onClick={() => setShowResetConfirm(true)}
+            disabled={isUsingDefault}
+            style={{ opacity: isUsingDefault ? 0.5 : 1, cursor: isUsingDefault ? 'not-allowed' : 'pointer' }}
+          >
+            <i className="fas fa-undo"></i> Reset to Default
+          </button>
+        </div>
+
+        <div className="template-preview">
+          <div className="wp-preview-tabs"><button className="secondary-btn" aria-pressed={previewMode==='formatted'} onClick={()=>setPreviewMode('formatted')}>Formatted preview</button><button className="secondary-btn" aria-pressed={previewMode==='raw'} onClick={()=>setPreviewMode('raw')}>Raw template</button></div>
+          {previewMode==='raw'?<pre>{momTemplate}</pre>:<div className="wp-document">{String(momTemplate||'').split('\n').map((line,i)=>/^[=—_-]{4,}\s*$/.test(line.trim())?null:/^[A-Z][A-Z &:/()-]{3,}$/.test(line.trim())?<h4 key={i}>{line.trim()}</h4>:<p key={i}>{line||'\u00a0'}</p>)}</div>}
+        </div>
+      </div>
+
+      <aside className="wp-template-help"><div className="wp-surface"><h4>Available placeholders</h4><p>Filled from meeting details.</p>{['title','date','time','type','platform','location','link','credentials','attendees','agenda'].map(k=><div className="wp-placeholder" key={k}><code>{'{'+k+'}'}</code><span>{k.charAt(0).toUpperCase()+k.slice(1)}</span></div>)}</div><div className="wp-surface"><h4>How templates work</h4><p>Use one template for consistent meeting minutes.</p><p>Placeholders are filled when generating a MOM.</p><p>Review the completed minutes before sharing.</p></div></aside></div>
+      <EditMomTemplateModal
+        show={showEditModal}
+        currentTemplate={momTemplate}
+        onClose={() => setShowEditModal(false)}
+        onSave={handleSave}
+      />
+
+      <ConfirmModal
+        show={showResetConfirm}
+        title="Reset to Default Template?"
+        message="Your current MOM template will be replaced with the default template. This action cannot be undone."
+        confirmText="Reset Template"
+        onConfirm={handleResetConfirm}
+        onCancel={() => setShowResetConfirm(false)}
+      />
+    </section>
+  );
+}
