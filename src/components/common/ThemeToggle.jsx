@@ -1,11 +1,19 @@
 import { motion, AnimatePresence } from 'motion/react';
+<<<<<<< HEAD
 import { nextTheme } from '../../utils/themes.js';
+=======
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 import { useTheme } from '../../context/ThemeContext.jsx';
 
 export default function ThemeToggle({ className = 'icon-btn' }) {
   const { theme, toggleTheme } = useTheme();
+<<<<<<< HEAD
   const targetTheme=nextTheme(theme);
   const label = `Current theme: ${theme}. Switch to ${targetTheme} mode`;
+=======
+  const isDark = theme === 'dark';
+  const label = `Switch to ${isDark ? 'light' : 'dark'} mode`;
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 
   return (
     <motion.button
@@ -36,7 +44,11 @@ export default function ThemeToggle({ className = 'icon-btn' }) {
           exit={{ rotate: 90, opacity: 0, scale: 0.6 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
         >
+<<<<<<< HEAD
           {targetTheme==='pink' ? (<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>) : targetTheme==='light' ? (
+=======
+          {isDark ? (
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
             <>
               <circle cx="12" cy="12" r="4" />
               <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />

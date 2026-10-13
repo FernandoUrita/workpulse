@@ -13,7 +13,10 @@ export default function MomTemplatesPage() {
   } = useAppData();
   const { showToast } = useToast();
 
+<<<<<<< HEAD
   const [previewMode,setPreviewMode]=useState('formatted');
+=======
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
   const [showEditModal, setShowEditModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -63,7 +66,11 @@ export default function MomTemplatesPage() {
         and other placeholders will be automatically replaced with actual meeting data.
       </details>
 
+<<<<<<< HEAD
       <div className="wp-template-layout"><div className="template-management">
+=======
+      <div className="template-management">
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
         <div className="template-actions">
           <button className="primary-btn" onClick={() => setShowEditModal(true)}>
             <i className="fas fa-edit"></i> Edit Template
@@ -79,12 +86,20 @@ export default function MomTemplatesPage() {
         </div>
 
         <div className="template-preview">
+<<<<<<< HEAD
           <div className="wp-preview-tabs"><button className="secondary-btn" aria-pressed={previewMode==='formatted'} onClick={()=>setPreviewMode('formatted')}>Formatted preview</button><button className="secondary-btn" aria-pressed={previewMode==='raw'} onClick={()=>setPreviewMode('raw')}>Raw template</button></div>
           {previewMode==='raw'?<pre>{momTemplate}</pre>:<div className="wp-document">{String(momTemplate||'').split('\n').map((line,i)=>/^[=—_-]{4,}\s*$/.test(line.trim())?null:/^[A-Z][A-Z &:/()-]{3,}$/.test(line.trim())?<h4 key={i}>{line.trim()}</h4>:<p key={i}>{line||'\u00a0'}</p>)}</div>}
         </div>
       </div>
 
       <aside className="wp-template-help"><div className="wp-surface"><h4>Available placeholders</h4><p>Filled from meeting details.</p>{['title','date','time','type','platform','location','link','credentials','attendees','agenda'].map(k=><div className="wp-placeholder" key={k}><code>{'{'+k+'}'}</code><span>{k.charAt(0).toUpperCase()+k.slice(1)}</span></div>)}</div><div className="wp-surface"><h4>How templates work</h4><p>Use one template for consistent meeting minutes.</p><p>Placeholders are filled when generating a MOM.</p><p>Review the completed minutes before sharing.</p></div></aside></div>
+=======
+          <h4><i className="fas fa-eye"></i> Current Template</h4>
+          <pre>{momTemplate}</pre>
+        </div>
+      </div>
+
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
       <EditMomTemplateModal
         show={showEditModal}
         currentTemplate={momTemplate}

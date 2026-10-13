@@ -9,7 +9,11 @@ import {
   todayISO 
 } from '../../utils/helpers.js';
 import DateNavigator from './DateNavigator.jsx';
+<<<<<<< HEAD
 
+=======
+import TaskCard from './TaskCard.jsx';
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 import TaskModal from './TaskModal.jsx';
 import TaskDetailModal from './TaskDetailModal.jsx';
 import KanbanBoard from './KanbanBoard.jsx';
@@ -298,7 +302,11 @@ export default function TasksPage() {
 
       <div className="task-progress-section">
         <div className="task-progress-info">
+<<<<<<< HEAD
           <h4>{dateScoped.length?<>Progress <span>{stats.percent}%</span></>:'No tasks to measure yet'}</h4>
+=======
+          <h4>Progress <span>{stats.percent}%</span></h4>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
           <div className="task-progress-bar">
             <div className="task-progress-fill" style={{ width: `${stats.percent}%` }}></div>
           </div>
@@ -423,7 +431,20 @@ export default function TasksPage() {
         </div>
       ) : (
         <>
+<<<<<<< HEAD
           <div className="wp-data-table"><table><thead><tr><th>Select</th><th>Task</th><th>Category</th><th>Priority</th><th>Due date</th><th>Status</th><th>Actions</th></tr></thead><tbody>{paginated.map(task=><tr key={task.id}><td><input type="checkbox" aria-label={`Select ${task.text}`} checked={selected.has(task.id)} onChange={()=>setSelected(previous=>{const next=new Set(previous);if(next.has(task.id))next.delete(task.id);else next.add(task.id);return next;})}/></td><td><button className="wp-text-button" onClick={()=>setDetailTask(task)}>{task.text}</button>{task.description&&<small>{task.description}</small>}</td><td>{task.category||'—'}</td><td><span className={`project-chip chip-${task.priority==='high'?'orange':task.priority==='low'?'gray':'yellow'}`}>{task.priority||'medium'}</span></td><td>{task.dueDate||'Not scheduled'}</td><td><button className="wp-text-button" onClick={()=>handleToggle(task.id)} aria-label={`Mark ${task.text} ${task.done?'pending':'completed'}`}><span className={`project-chip chip-${task.done?'green':'yellow'}`}>{task.done?'Completed':'Pending'}</span></button></td><td><div className="wp-card-actions"><button className="icon-btn" aria-label={`Edit ${task.text}`} onClick={()=>handleEdit(task)}><i className="fas fa-pen" aria-hidden="true"/></button><details className="wp-more"><summary aria-label={`More actions for ${task.text}`}>⋮</summary><button className="danger-btn" onClick={()=>handleDelete(task)}>Delete task</button></details></div></td></tr>)}</tbody></table></div>
+=======
+          {paginated.map(task => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onToggle={handleToggle}
+              onView={setDetailTask}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { formatDate } from '../../utils/helpers.js';
+=======
+import { escapeHtml, formatDate } from '../../utils/helpers.js';
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 import { computeAging, getStatusClass, getPriorityClass } from '../../utils/ticketHelpers.js';
 
 export default function TicketCard({ ticket, onView, onEdit, onDelete }) {
@@ -28,18 +32,30 @@ export default function TicketCard({ ticket, onView, onEdit, onDelete }) {
       <div className="ticket-card-body">
         <div className="ticket-card-client">
           <i className="fas fa-building"></i>
+<<<<<<< HEAD
           <strong>{ticket.clientName || 'No client'}</strong>
+=======
+          <strong>{escapeHtml(ticket.clientName || 'No client')}</strong>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
         </div>
 
         <div
           className="ticket-card-subject"
           onClick={() => onView(ticket)}
         >
+<<<<<<< HEAD
           {ticket.subject || ticket.remarks || 'No subject'}
         </div>
 
         {ticket.remarks && ticket.subject && (
           <div className="ticket-card-remarks">{ticket.remarks}</div>
+=======
+          {escapeHtml(ticket.subject || ticket.remarks || 'No subject')}
+        </div>
+
+        {ticket.remarks && ticket.subject && (
+          <div className="ticket-card-remarks">{escapeHtml(ticket.remarks)}</div>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
         )}
       </div>
 
@@ -69,6 +85,7 @@ export default function TicketCard({ ticket, onView, onEdit, onDelete }) {
       </div>
 
       <div className="ticket-card-actions">
+<<<<<<< HEAD
         <button className="primary-btn" onClick={() => onView(ticket)}>
           <i className="fas fa-eye"></i> View details
         </button>
@@ -76,6 +93,17 @@ export default function TicketCard({ ticket, onView, onEdit, onDelete }) {
           <i className="fas fa-edit"></i> Edit
         </button>
         <details className="wp-more"><summary aria-label="More actions">⋮</summary><button className="danger-btn" onClick={()=>onDelete(ticket)}>Delete</button></details>
+=======
+        <button className="action-view" onClick={() => onView(ticket)}>
+          <i className="fas fa-eye"></i> View
+        </button>
+        <button className="action-edit" onClick={() => onEdit(ticket)}>
+          <i className="fas fa-edit"></i> Edit
+        </button>
+        <button className="action-delete" onClick={() => onDelete(ticket)}>
+          <i className="fas fa-trash"></i>
+        </button>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
       </div>
     </div>
   );

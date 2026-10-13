@@ -17,10 +17,27 @@ const ACTION_META = {
 const PAGE_SIZE = 20;
 
 function getDateGroup(timestamp) {
+<<<<<<< HEAD
   return new Date(timestamp).toLocaleDateString('en-US',{timeZone:'Asia/Manila',month:'short',day:'numeric',year:'numeric'});
 }
 
 
+=======
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startOfYesterday = startOfToday - 24 * 60 * 60 * 1000;
+  const startOfWeek = startOfToday - 7 * 24 * 60 * 60 * 1000;
+  const startOfMonth = startOfToday - 30 * 24 * 60 * 60 * 1000;
+
+  if (timestamp >= startOfToday) return 'Today';
+  if (timestamp >= startOfYesterday) return 'Yesterday';
+  if (timestamp >= startOfWeek) return 'This Week';
+  if (timestamp >= startOfMonth) return 'This Month';
+  return 'Older';
+}
+
+const DATE_GROUP_ORDER = ['Today', 'Yesterday', 'This Week', 'This Month', 'Older'];
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 
 export default function ActivityPage() {
   const { tasks } = useAppData();
@@ -79,7 +96,13 @@ export default function ActivityPage() {
       if (!groups[group]) groups[group] = [];
       groups[group].push(a);
     });
+<<<<<<< HEAD
     return Object.entries(groups);
+=======
+    return DATE_GROUP_ORDER
+      .filter(g => groups[g] && groups[g].length > 0)
+      .map(g => [g, groups[g]]);
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
   }, [filtered]);
 
   const hasMore = filtered.length > visibleCount;
@@ -209,7 +232,11 @@ export default function ActivityPage() {
                       <div className={`activity-card-icon ${meta.class}`}>
                         <i className={`fas ${meta.icon}`}></i>
                       </div>
+<<<<<<< HEAD
                       <span className="wp-avatar" aria-hidden="true">{String(entry.user||'S')[0].toUpperCase()}</span><div className="activity-card-content">
+=======
+                      <div className="activity-card-content">
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
                         <div className="activity-card-title">
                           <strong>{entry.user || 'system'}</strong>{' '}
                           <span className="activity-action-label">{meta.label.toLowerCase()}</span>{' '}

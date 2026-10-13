@@ -155,7 +155,11 @@ export default function MeetingsPage() {
   };
 
   return (
+<<<<<<< HEAD
     <section className="module wp-meetings">
+=======
+    <section className="module">
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
       <div className="module-header">
         <div className="module-heading"><h3><i className="fas fa-calendar-alt"></i> Meeting Management</h3><p className="module-description">Keep schedules, agendas, and meeting minutes together.</p></div>
         <div className="module-actions">
@@ -187,7 +191,10 @@ export default function MeetingsPage() {
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="wp-summary-strip"><span><strong>{meetings.length}</strong> Meetings</span><span><strong>{meetings.filter(m=>!isMeetingPast(m)&&!m.completed).length}</strong> Upcoming</span><span><strong>{meetings.filter(m=>isMeetingPast(m)&&!m.completed).length}</strong> Past</span><span><strong>{meetings.filter(m=>m.completed).length}</strong> Completed</span></div>
+=======
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
       {filtered.length === 0 ? (
         <div className="empty-state-enhanced">
           <div className="empty-illustration meetings">

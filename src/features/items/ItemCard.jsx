@@ -154,6 +154,7 @@ export default function ItemCard({ item, onView, onEdit, onDelete, onCheckin }) 
       )}
 
       <div className="item-card-actions">
+<<<<<<< HEAD
         <button className="secondary-btn" onClick={() => onView(item)}>
           <i className="fas fa-eye"></i> View details
         </button>
@@ -166,6 +167,22 @@ export default function ItemCard({ item, onView, onEdit, onDelete, onCheckin }) 
           <i className="fas fa-edit"></i> Edit
         </button>
         <details className="wp-more"><summary aria-label="More actions">⋮</summary><button className="danger-btn" onClick={()=>onDelete(item)}>Delete</button></details>
+=======
+        <button className="action-view" onClick={() => onView(item)}>
+          <i className="fas fa-eye"></i>
+        </button>
+        {item.type === 'monitoring' && (
+          <button className="action-checkin" onClick={() => onCheckin(item)}>
+            <i className="fas fa-clipboard-check"></i> Check-in
+          </button>
+        )}
+        <button className="action-edit" onClick={() => onEdit(item)}>
+          <i className="fas fa-edit"></i>
+        </button>
+        <button className="action-delete" onClick={() => onDelete(item)}>
+          <i className="fas fa-trash"></i>
+        </button>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
       </div>
     </div>
   );

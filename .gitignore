@@ -24,5 +24,8 @@ dist-ssr
 *.sw?
 .env.local
 .env
+<<<<<<< HEAD
 
 .ui-check/
+=======
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45

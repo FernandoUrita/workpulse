@@ -1,6 +1,10 @@
 import ProjectReports from './ProjectReports.jsx';
 import '../../styles/projects.css';
+<<<<<<< HEAD
 
+=======
+import UrgentAttentionButton from '../../components/common/UrgentAttentionButton.jsx';
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 import EmployeeReportModal from '../../components/common/EmployeeReportModal.jsx';
 import SendNotificationModal from '../../components/common/SendNotificationModal.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -29,7 +33,10 @@ export default function ReportsPage() {
   const canSend = ['head', 'admin'].includes(currentUser?.role);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [recipient, setRecipient] = useState(null);
+<<<<<<< HEAD
   const [employeeSearch,setEmployeeSearch]=useState('');const [employeeRole,setEmployeeRole]=useState('all');
+=======
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
   const [reportNow, setReportNow] = useState(() => Date.now());
   const [dateRange, setDateRange] = useState('all');
   const [reportTab,setReportTab]=useState('employees');
@@ -236,7 +243,11 @@ export default function ReportsPage() {
             <p>No activity in this date range.</p>
           </div>
         ) : (
+<<<<<<< HEAD
           <div className="reports-table-wrapper"><div className="toolbar"><div className="search-box"><i className="fas fa-search" aria-hidden="true"/><input aria-label="Search employees" placeholder="Search employee…" value={employeeSearch} onChange={e=>setEmployeeSearch(e.target.value)}/></div><select aria-label="Filter employee role" value={employeeRole} onChange={e=>setEmployeeRole(e.target.value)}><option value="all">All roles</option>{['employee','head','admin'].map(role=><option key={role}>{role}</option>)}</select></div>
+=======
+          <div className="reports-table-wrapper">
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
             <table className="reports-table">
               <thead>
                 <tr>
@@ -251,7 +262,11 @@ export default function ReportsPage() {
                 </tr>
               </thead>
               <tbody>
+<<<<<<< HEAD
                 {employeeStats.filter(e=>(employeeRole==='all'||e.role===employeeRole)&&`${e.name} ${e.username}`.toLowerCase().includes(employeeSearch.toLowerCase())).map(e => (
+=======
+                {employeeStats.map(e => (
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
                   <tr key={e.id} className="reports-employee-row" onClick={() => setSelectedEmployeeId(e.id)}>
                     <td>
                       <div className="reports-user-cell">
@@ -290,7 +305,11 @@ export default function ReportsPage() {
                         <span className="activity-bar-label">{e.totalActivity}</span>
                       </div>
                     </td>
+<<<<<<< HEAD
                     {canSend && <td><div className="reports-reminder-actions"><button className="secondary-btn" onClick={event=>{event.stopPropagation();setRecipient(e);}}><i className="fas fa-bell" aria-hidden="true"/> Send reminder</button><button type="button" className="btn" title="Send notification" aria-label={`Send reminder to ${e.name || e.username}`} onClick={event => { event.stopPropagation(); setRecipient(e); }}><i className="fas fa-paper-plane" aria-hidden="true"></i></button></div></td>}
+=======
+                    {canSend && <td><div className="reports-reminder-actions"><UrgentAttentionButton employee={e} /><button type="button" className="btn" title="Send notification" aria-label={`Send reminder to ${e.name || e.username}`} onClick={event => { event.stopPropagation(); setRecipient(e); }}><i className="fas fa-paper-plane" aria-hidden="true"></i></button></div></td>}
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
                   </tr>
                 ))}
               </tbody>

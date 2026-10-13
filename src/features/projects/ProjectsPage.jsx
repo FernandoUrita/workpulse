@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import { createPortal } from 'react-dom';
+=======
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 import ProjectPicker from '../../components/common/ProjectPicker.jsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -31,7 +34,11 @@ export default function ProjectsPage() {
  const userName=id=>data.profiles.find(p=>p.id===id)?.name||data.profiles.find(p=>p.id===id)?.username||'—';
  const groups=data.projects.filter(project=>showArchived||!project.archived);
  const selected=groups.find(project=>project.id===params.get('project'))||groups[0];
+<<<<<<< HEAD
  return <section className="module projects-module"><div className="module-header"><div className="module-heading"><h3><i className="fas fa-project-diagram" aria-hidden="true" /> {selected?.name||'Project tables'}</h3><p className="module-description">Track development, deployment and client confirmation.</p></div><div className="module-actions"><button className="secondary-btn" onClick={()=>{void refresh();}}>Refresh</button>{head&&<button className="primary-btn" onClick={()=>setDialog({kind:'project'})}>+ New Project</button>}</div></div>
+=======
+ return <section className="module projects-module"><div className="module-header"><div className="module-heading"><h3><i className="fas fa-project-diagram" aria-hidden="true" /> Project tables</h3><p className="module-description">Client work tables with assignments and remarks history.</p></div><div className="module-actions"><button className="secondary-btn" onClick={()=>{void refresh();}}>Refresh</button>{head&&<button className="primary-btn" onClick={()=>setDialog({kind:'project'})}>+ New Project</button>}</div></div>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
  {error&&<p className="projects-error" role="alert">{error}</p>}
  {loading?<p role="status">Loading projects…</p>:<>
  <div className="project-workspace-bar"><ProjectPicker projects={groups} selected={selected} onChange={id=>setParams(previous=>{const next=new URLSearchParams(previous);next.set('project',id);return next;})}/><label className="projects-checkbox"><input type="checkbox" checked={showArchived} onChange={event=>setShowArchived(event.target.checked)}/> Include archived</label>{selected&&<div className="project-workspace-client"><strong>{selected.client_name||selected.name}</strong><span className={`project-tier tier-${(selected.tier||'Standard').toLowerCase()}`}>{selected.tier}</span></div>}</div>
@@ -53,6 +60,7 @@ function ValueBadges({value,kind}) {
 }
 
 function ProjectTable({project,rows,audit,currentUser,head,userName,onEdit}) {
+<<<<<<< HEAD
  const [query,setQuery]=useState('');const [filter,setFilter]=useState('all');const [page,setPage]=useState(1);const [history,setHistory]=useState(false);const [fit,setFit]=useState(true);const [pageSize,setPageSize]=useState(5);
  const filtered=rows.filter(row=>(filter==='all'||row.status===filter)&&PROJECT_COLUMNS.some(([key])=>String(row[key]||'').toLowerCase().includes(query.toLowerCase())));
  const pages=Math.max(1,Math.ceil(filtered.length/pageSize));const currentPage=Math.min(page,pages);
@@ -62,12 +70,20 @@ function ProjectTable({project,rows,audit,currentUser,head,userName,onEdit}) {
   if(key==='customization')return <div className="wp-customization"><strong>{row.custom_name||'Untitled'}</strong><small>{row.ticket_no||'No ticket number'}</small><span className={`project-chip chip-${row.is_signed?'green':'yellow'}`}>{row.is_signed?'Signed':'Unsigned'}</span></div>;
   if(key==='team')return <div className="wp-team">{[['Support',row.assigned_to?userName(row.assigned_to):'—'],['Dev',row.assigned_dev],['QA',row.assigned_qa]].map(([role,name])=><div className="wp-person" key={role}><span className="wp-avatar" aria-hidden="true">{String(name||'—').split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span><span><small>{role}</small>{name||'Unassigned'}</span></div>)}</div>;
   if(key==='deployment_date')return row[key]?new Date(`${row[key]}T12:00:00`).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Not scheduled';
+=======
+ const [query,setQuery]=useState('');const [filter,setFilter]=useState('all');const [page,setPage]=useState(1);const [history,setHistory]=useState(false);const [fit,setFit]=useState(true);
+ const filtered=rows.filter(row=>(filter==='all'||row.status===filter)&&PROJECT_COLUMNS.some(([key])=>String(row[key]||'').toLowerCase().includes(query.toLowerCase())));
+ const pages=Math.max(1,Math.ceil(filtered.length/10));const currentPage=Math.min(page,pages);
+ const editable=row=>head||[project.poc_id,row.created_by,row.assigned_to].includes(currentUser.id);
+ const value=(row,key)=>{
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
   if(key==='remarks')return row.remarks?.trim()?<div className="project-remarks-cell"><p className="project-remarks-preview">{row.remarks.replace(/\s+/g,' ').trim()}</p><button type="button" className="project-remarks-link" aria-label={`View remarks for ${row.ticket_no||row.custom_name}`} onClick={()=>onEdit({kind:'remarks',value:row,canEdit:editable(row)&&!project.archived})}>View remarks <i className="fas fa-external-link-alt" aria-hidden="true"/></button></div>:'—';
   if(key==='assigned_to')return row[key]?<ValueBadges value={userName(row[key])} kind="person"/>:'—';
   if(['status','pending_to','system','assigned_dev','assigned_qa'].includes(key))return <ValueBadges value={row[key]} kind={key}/>;
   if(key==='is_signed')return <span className={`project-chip chip-${row[key]?'green':'yellow'}`}>{row[key]?'Yes':'No'}</span>;
   return row[key]||'—';
  };
+<<<<<<< HEAD
  return <section className="project-group project-workspace-table" aria-label={`${project.name} rows`}><div className="project-group-body"><div className="project-workspace-summary"><strong>{rows.length} total</strong><span>{rows.filter(r=>r.status==='Ongoing').length} ongoing</span><span>{rows.filter(r=>r.status==='On Hold').length} on hold</span><span>Client confirmation → Head approval → Active{project.archived?' · Archived':''}</span></div>
  <div className="project-overview-actions"><button type="button" className="secondary-btn" aria-pressed={fit} onClick={()=>setFit(!fit)}>{fit?'Detailed columns':'Compact columns'}</button>{head&&<button className="secondary-btn" onClick={()=>onEdit({kind:'project',value:project})}>Edit Project</button>}<button type="button" className="secondary-btn" aria-haspopup="dialog" onClick={()=>setHistory(true)}>History</button>{!project.archived&&<><button className="secondary-btn" onClick={()=>onEdit({kind:'import'})}>Import CSV</button><button className="primary-btn" onClick={()=>onEdit({kind:'row'})}>+ Add Row</button></>}</div>
  <div className="projects-toolbar"><label>Search<input value={query} placeholder="Ticket, client or remarks…" onChange={event=>{setQuery(event.target.value);setPage(1);}}/></label><label>Work status<select value={filter} onChange={event=>{setFilter(event.target.value);setPage(1);}}><option value="all">All rows</option>{PROJECT_STATUSES.map(status=><option key={status}>{status}</option>)}</select></label></div>
@@ -87,6 +103,18 @@ function ProjectHistoryDialog({project,audit,userName,onClose}) {
  </div></div>,document.body);
 }
 
+=======
+ return <section className="project-group project-workspace-table" aria-label={`${project.name} rows`}><div className="project-group-body"><div className="project-workspace-summary"><strong>{rows.length} items</strong><span>Client confirmation → Head approval → Active{project.archived?' · Archived':''}</span></div>
+ <div className="project-overview-actions"><button type="button" className="secondary-btn" aria-pressed={fit} onClick={()=>setFit(!fit)}>{fit?'Detailed width':'Fit table'}</button>{head&&<button className="secondary-btn" onClick={()=>onEdit({kind:'project',value:project})}>Edit Project</button>}<button className="secondary-btn" aria-pressed={history} onClick={()=>setHistory(!history)}>History</button>{!project.archived&&<><button className="secondary-btn" onClick={()=>onEdit({kind:'import'})}>Import CSV</button><button className="primary-btn" onClick={()=>onEdit({kind:'row'})}>+ Add Row</button></>}</div>
+ <div className="projects-toolbar"><label>Search<input value={query} placeholder="Ticket, client or remarks…" onChange={event=>{setQuery(event.target.value);setPage(1);}}/></label><label>Work status<select value={filter} onChange={event=>{setFilter(event.target.value);setPage(1);}}><option value="all">All rows</option>{PROJECT_STATUSES.map(status=><option key={status}>{status}</option>)}</select></label></div>
+ <div className={`projects-table ${fit ? 'projects-table-fit' : ''}`}><table><colgroup>{[6,12,8,7,7,7,7,8,5,8,9,12,4].map((width,index)=><col key={index} style={fit?{width:`${width}%`}:undefined}/>)}</colgroup><thead><tr>{TABLE_COLUMNS.map(([key,label])=><th key={key}>{label}</th>)}<th aria-label="Actions"><i className="fas fa-ellipsis-h" aria-hidden="true"/></th></tr></thead><tbody>{filtered.slice((currentPage-1)*10,currentPage*10).map(row=><tr key={row.id}>{TABLE_COLUMNS.map(([key])=><td key={key} className={key==='remarks'?'project-remarks-column':undefined}>{value(row,key)}</td>)}<td><div className="project-row-actions">{row.status==='Deployed'&&row.client_confirmed_at&&<><span className="project-chip chip-orange">{row.approval_status==='rejected'?'Rejected':'For approval'}</span>{head&&row.approval_status==='pending'&&!project.archived&&<button className="secondary-btn" onClick={()=>onEdit({kind:'review',value:row})}>Review</button>}</>}{row.status==='Active'&&row.approved_at&&<span className="project-chip chip-green">Approved</span>}{!project.archived&&editable(row)&&<button type="button" className="secondary-btn project-icon-action" title="Edit row and priority" aria-label={`Edit ${row.ticket_no||row.custom_name}`} onClick={()=>onEdit({kind:'row',value:row})}><i className="fas fa-pen" aria-hidden="true"/></button>}</div></td></tr>)}{!filtered.length&&<tr><td colSpan={TABLE_COLUMNS.length+1}>No matching rows.</td></tr>}</tbody></table></div>
+ <div className="projects-pagination"><span>{filtered.length} rows · Page {currentPage} of {pages}</span><button className="secondary-btn" disabled={currentPage===1} onClick={()=>setPage(currentPage-1)}>Previous</button><button className="secondary-btn" disabled={currentPage===pages} onClick={()=>setPage(currentPage+1)}>Next</button></div>
+ {history&&<div className="project-history"><h4>Recent history</h4><p>From the latest 200 events across projects.</p>{audit.map(entry=><p key={entry.id}>{entry.action} · {userName(entry.actor_id)} · {new Date(entry.created_at).toLocaleString()}</p>)}</div>}
+ <small className="project-table-note">{fit?'Fit mode wraps text to show all columns when enough space is available. Minimize the sidebar for more room.':'Detailed width uses horizontal scrolling for larger cells.'}</small>
+ </div></section>;
+}
+
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 function ProjectEditor({dialog,profiles,currentUser,head,onClose,onSaved}) {
  const kind=dialog.kind;const group=kind==='project';const importing=kind==='import';
  const [form,setForm]=useState(()=>(dialog.value?{...dialog.value,client_confirmed:!!dialog.value.client_confirmed_at}:null)||(group?{name:'',client_name:'',tier:'Standard',poc_id:'',archived:false}:{...emptyProjectRow(),client_name:dialog.project?.client_name||'',client_tier:dialog.project?.tier||'Standard',assigned_to:dialog.project?.poc_id||''}));

@@ -78,7 +78,11 @@ export default function SettingsPage() {
       <div className="settings-container">
         {/* ─── PROFILE ─────────────────────────── */}
         <div className="settings-group" role="tabpanel" id="settings-panel-profile" aria-labelledby="settings-tab-profile" hidden={tab!=='profile'}>
+<<<<<<< HEAD
           <h4><i className="fas fa-user"></i> Profile</h4><p className="module-description">Your account information.</p><div className="wp-profile-heading"><span className="wp-avatar">{String(currentUser?.name||'U').split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase()}</span><strong>{currentUser?.name}</strong><span className={`role-badge role-${currentUser?.role}`}>{currentUser?.role}</span></div>
+=======
+          <h4><i className="fas fa-user"></i> Profile</h4>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 
           <div className="settings-item">
             <label><i className="fas fa-user-tag"></i> Username</label>
@@ -89,7 +93,11 @@ export default function SettingsPage() {
             />
           </div>
 
+<<<<<<< HEAD
           <small>Username cannot be changed here.</small><div className="settings-item">
+=======
+          <div className="settings-item">
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
             <label><i className="fas fa-user"></i> Full Name</label>
             <input
               type="text"
@@ -114,7 +122,11 @@ export default function SettingsPage() {
           <div className="settings-item">
             <div className="settings-actions">
               <button className="primary-btn" onClick={handleUpdateProfile}>
+<<<<<<< HEAD
                 <i className="fas fa-save"></i> Save changes
+=======
+                <i className="fas fa-save"></i> Update Profile
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
               </button>
             </div>
           </div>
@@ -125,13 +137,37 @@ export default function SettingsPage() {
           <h4><i className="fas fa-palette"></i> Appearance</h4>
 
           <div className="settings-info">
+<<<<<<< HEAD
             <strong>Current theme:</strong> {theme === 'pink' ? 'Pink Mode' : theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+=======
+            <strong>Current theme:</strong> {theme === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
             <br />
             Your preference is saved automatically and will persist across sessions.
           </div>
 
+<<<<<<< HEAD
           <div className="theme-preview" aria-label="Choose a color theme">
             {[['light','Light Mode','Bright and clean','fa-sun'],['dark','Dark Mode','Easy on the eyes','fa-moon'],['pink','Pink Mode','Soft rose workspace','fa-heart']].map(([id,label,description,icon])=><button type="button" key={id} className={`theme-option theme-option-${id} ${theme===id?'active':''}`} aria-pressed={theme===id} onClick={()=>handleThemeChange(id)}><div className={`wp-theme-swatch swatch-${id}`} aria-hidden="true"><span/><span/><span/></div><div className="theme-label"><i className={`fas ${icon}`} aria-hidden="true"/> {label}</div><div className="theme-desc">{description}</div>{theme===id&&<small>Selected</small>}</button>)}
+=======
+          <div className="theme-preview">
+            <button
+              className={`theme-option ${theme === 'light' ? 'active' : ''}`}
+              onClick={() => handleThemeChange('light')}
+            >
+              <div className="theme-icon">☀️</div>
+              <div className="theme-label">Light Mode</div>
+              <div className="theme-desc">Bright and clean</div>
+            </button>
+            <button
+              className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
+              onClick={() => handleThemeChange('dark')}
+            >
+              <div className="theme-icon">🌙</div>
+              <div className="theme-label">Dark Mode</div>
+              <div className="theme-desc">Easy on the eyes</div>
+            </button>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
           </div>
         </div>
 

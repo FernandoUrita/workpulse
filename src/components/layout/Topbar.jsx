@@ -17,7 +17,11 @@ export default function Topbar({ currentPath, onMenuClick, onOpenCommandPalette 
         <button className="mobile-menu-btn" onClick={onMenuClick} aria-label="Open navigation">
           <i className="fas fa-bars"></i>
         </button>
+<<<<<<< HEAD
         <div className="wp-breadcrumb"><span>{title}</span><span aria-hidden="true">/</span><strong>{({'/dashboard':'Dashboard','/tasks':'Tasks','/tickets':'Tickets','/items':'Support items','/meetings':'Meetings','/mom':'MOM Templates','/projects':'Project tables','/projects/monitoring':'Monitoring','/reports':'Reports','/users':'Users','/activity':'Activity','/settings':'Settings'})[currentPath]||'Overview'}</strong></div>
+=======
+        <h2>{title}</h2>
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
       </div>
       <div className="topbar-right">
         <button

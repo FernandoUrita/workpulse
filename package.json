@@ -8,8 +8,12 @@
     "build": "vite build && node scripts/build-pwa.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
+<<<<<<< HEAD
     "test:pwa": "node --test scripts/pwa.test.mjs",
     "test:ui": "vite build --ssr scripts/ui-layout-check.jsx --outDir .ui-check && node .ui-check/ui-layout-check.js"
+=======
+    "test:pwa": "node --test scripts/pwa.test.mjs"
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

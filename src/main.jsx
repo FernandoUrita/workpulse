@@ -15,6 +15,7 @@ import './styles/notification-ui.css';
 import { startPwa } from './pwa/client.js'
 
 import './styles/ui-refresh.css'
+<<<<<<< HEAD
 // Load module styles once before the shared contract so lazy navigation cannot
 // change the cascade or reset sizes on a subsequent page visit.
 import './styles/settings-workspace.css'
@@ -26,6 +27,8 @@ import './styles/project-picker.css'
 import './styles/employee-report.css'
 import './styles/project-reports.css'
 import './styles/unified-ui.css'
+=======
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
 
 // Context Providers
 import { ToastProvider } from './context/ToastContext.jsx'

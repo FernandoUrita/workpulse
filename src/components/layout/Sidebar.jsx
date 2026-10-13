@@ -78,6 +78,7 @@ export default function Sidebar({ isOpen, onToggle, minimized, onMinimize }) {
 
       <div className="user-profile">
         <div className="user-avatar">
+<<<<<<< HEAD
           <span className="wp-sidebar-avatar" aria-hidden="true">{String(currentUser?.name||currentUser?.username||'U').split(/\s+/).filter(Boolean).slice(0,2).map(n=>n[0]).join('').toUpperCase()}</span>
         </div>
         <div className="user-info">
@@ -85,6 +86,15 @@ export default function Sidebar({ isOpen, onToggle, minimized, onMinimize }) {
           <span title={`@${currentUser?.username || 'username'}`}>@{currentUser?.username || 'username'}</span>
         </div>
         <button className="logout-btn" onClick={logout} title="Logout" aria-label="Log out">
+=======
+          <i className="fas fa-user-circle"></i>
+        </div>
+        <div className="user-info">
+          <h4>{currentUser?.name || 'User'}</h4>
+          <span>@{currentUser?.username || 'username'}</span>
+        </div>
+        <button className="logout-btn" onClick={logout} title="Logout">
+>>>>>>> cfe308f0e4c7181f662947f40efa60a124262d45
           <i className="fas fa-sign-out-alt"></i>
         </button>
       </div>
